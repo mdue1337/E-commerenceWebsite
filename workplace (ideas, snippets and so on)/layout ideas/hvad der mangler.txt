@@ -1,0 +1,7 @@
+betalingskærm.
+
+admin/sælger overview
+	- antal salg osv.
+	- opret nye listings
+
+Listing view
