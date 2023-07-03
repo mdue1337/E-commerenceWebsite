@@ -1,0 +1,8 @@
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\ImageToBytesAndViceVersa\ImageBytes\ImageBytes\bin\Debug\ImageBytes.exe.config
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\ImageToBytesAndViceVersa\ImageBytes\ImageBytes\bin\Debug\ImageBytes.exe
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\ImageToBytesAndViceVersa\ImageBytes\ImageBytes\bin\Debug\ImageBytes.pdb
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\ImageToBytesAndViceVersa\ImageBytes\ImageBytes\obj\Debug\ImageBytes.csproj.AssemblyReference.cache
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\ImageToBytesAndViceVersa\ImageBytes\ImageBytes\obj\Debug\ImageBytes.csproj.SuggestedBindingRedirects.cache
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\ImageToBytesAndViceVersa\ImageBytes\ImageBytes\obj\Debug\ImageBytes.csproj.CoreCompileInputs.cache
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\ImageToBytesAndViceVersa\ImageBytes\ImageBytes\obj\Debug\ImageBytes.exe
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\ImageToBytesAndViceVersa\ImageBytes\ImageBytes\obj\Debug\ImageBytes.pdb
