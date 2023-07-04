@@ -1,0 +1,84 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\marti\\OneDrive - TEC\\Documents\\Martins Coding Projects\\E-commerenceWebsite\\Api\\WebsiteDatabaseApi\\WebsiteDatabaseApi\\WebsiteDatabaseApi.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\marti\\OneDrive - TEC\\Documents\\Martins Coding Projects\\E-commerenceWebsite\\Api\\WebsiteDatabaseApi\\WebsiteDatabaseApi\\WebsiteDatabaseApi.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\marti\\OneDrive - TEC\\Documents\\Martins Coding Projects\\E-commerenceWebsite\\Api\\WebsiteDatabaseApi\\WebsiteDatabaseApi\\WebsiteDatabaseApi.csproj",
+        "projectName": "WebsiteDatabaseApi",
+        "projectPath": "C:\\Users\\marti\\OneDrive - TEC\\Documents\\Martins Coding Projects\\E-commerenceWebsite\\Api\\WebsiteDatabaseApi\\WebsiteDatabaseApi\\WebsiteDatabaseApi.csproj",
+        "packagesPath": "C:\\Users\\marti\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\marti\\OneDrive - TEC\\Documents\\Martins Coding Projects\\E-commerenceWebsite\\Api\\WebsiteDatabaseApi\\WebsiteDatabaseApi\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\marti\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.0.143, )"
+            },
+            "Stub.System.Data.SQLite.Core.NetFramework": {
+              "target": "Package",
+              "version": "[1.0.118, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.2.3, )"
+            },
+            "System.Data.SQLite.Core": {
+              "target": "Package",
+              "version": "[1.0.118, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
