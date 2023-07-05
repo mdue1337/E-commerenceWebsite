@@ -1,3 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
+using WebsiteDatabaseApi;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,7 +8,7 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// builder.Services.AddTransient<SqliteDataAccess>();
+builder.Services.AddTransient<DatabaseConnection>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
