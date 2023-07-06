@@ -5,11 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="WebShopDatabase.db" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <Content Include="WebShopDatabase.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
