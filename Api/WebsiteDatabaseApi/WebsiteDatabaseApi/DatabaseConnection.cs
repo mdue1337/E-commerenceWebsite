@@ -1,5 +1,7 @@
 ﻿using Dapper;
 using System;
+using System.Buffers.Text;
+using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
@@ -20,7 +22,7 @@ namespace WebsiteDatabaseApi
 
         public List<UserModel> LoadUsers()
         {
-            using(IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
                 string sql = "SELECT * FROM USERS";
                 var query = cnn.Query<UserModel>(sql);
@@ -44,8 +46,61 @@ namespace WebsiteDatabaseApi
             using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
                 string sql = "SELECT * FROM Review INNER JOIN Products ON Review.ProductId = @Id";
-                var output = cnn.Query<ReviewModel>(sql, new {Id = Id});
+                var output = cnn.Query<ReviewModel>(sql, new { Id = Id });
                 return output.ToList();
+            }
+        }
+
+        public string CreateListing(string Name, int CategoryId, double Price, int Stock, byte[] ImageBytes, string categoryColor, string categorySize, string categoryBrand)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                try
+                {
+                    if (CategoryId == 1)
+                    {
+                        string ClothingColor = categoryColor;
+                        string ClothingSize = categorySize;
+                        string ClothingBrand = categoryBrand;
+                        string sql = "INSERT INTO Products (Name, CategoryId, Price, Stock, PictureBytes, ClothingColor, ClothingSize, ClothingBrand) VALUES (@Name, @CategoryId, @Price, @Stock, @PictureBytes, @ClothingColor, @ClothingSize, @ClothingBrand)";
+                        cnn.Execute(sql, new { Name = Name, CategoryId = CategoryId, Price = Price, Stock = Stock, PictureBytes = ImageBytes, ClothingColor = ClothingColor, ClothingSize = ClothingSize, ClothingBrand = ClothingBrand });
+                    }
+                    else if (CategoryId == 2)
+                    {
+                        string ShoesColor = categoryColor;
+                        int ShoesSize = int.Parse(categorySize);
+                        string ShoesBrand = categoryBrand;
+                        string sql = "INSERT INTO Products (Name, CategoryId, Price, Stock, PictureBytes, ShoesColor, ShoesSize, ShoesBrand) VALUES (@Name, @CategoryId, @Price, @Stock, @PictureBytes, @ShoesColor, @ShoesSize, @ShoesBrand)";
+                        cnn.Execute(sql, new { Name = Name, CategoryId = CategoryId, Price = Price, Stock = Stock, PictureBytes = ImageBytes, ShoesColor = ShoesColor, ShoesSize = ShoesSize, ShoesBrand = ShoesBrand });
+                    }
+                    return null;
+                }
+                catch (Exception ex)
+                {
+                    return ex.ToString();
+                }
+            }
+        }
+
+        public List<ProductsModel> GetProductByCategoryAndAllSizes(int CategoryId)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                var products = GetProductsByCategory(CategoryId);
+                var productListType = products.GetType().GetGenericArguments()[0];
+
+                var output = new List<ProductsModel>();
+
+                if (productListType == typeof(ClothingProductModel))
+                {
+                    output = cnn.Query<ClothingProductModel>("").ToList<ProductsModel>();
+                }
+                else if (productListType == typeof(ShoesProductModel))
+                {
+                    output = cnn.Query<ShoesProductModel>("").ToList<ProductsModel>();
+                }
+                
+                return output;
             }
         }
 
@@ -63,9 +118,9 @@ namespace WebsiteDatabaseApi
                     ProductsModel mappedProduct = categoryId switch
                     {
                         // Clothing category
-                        1 => MapToClothingProduct(product),
+                        1 => MapToClothingProduct(cnn.Query<ClothingProductModel>(sql, new { CategoryId = categoryId, ProductId = product.Id }).FirstOrDefault()),
                         // Shoes category
-                        2 => MapToShoesProduct(product),
+                        2 => MapToShoesProduct(cnn.Query<ShoesProductModel>(sql, new { CategoryId = categoryId, ProductId = product.Id }).FirstOrDefault()),
                         _ => product // Default to the base Products model
                     };
                     mappedProducts.Add(mappedProduct);

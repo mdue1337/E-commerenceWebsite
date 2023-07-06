@@ -1,0 +1,7 @@
+Gør et opgør med at der ikke er mulighed for at oplyse om de forskellige størrelser, her burde der måske være en tabel til tøj og sko med alle størrelser og hvor mange der er i hver størrelse.
+
+f.eks. StockId = 1, har SizeMedium = 10, SizeLarge = 7 og lignende. 
+
+Dette skal så medtænkes når der oprettes en listing.
+
+Der skal dernæst laves en metode som henter alle disse dataer, altså hvilket produkt, categori, og antal der er i "stock".

@@ -48,6 +48,10 @@
               "target": "Package",
               "version": "[7.0.0, )"
             },
+            "SixLabors.ImageSharp": {
+              "target": "Package",
+              "version": "[3.0.1, )"
+            },
             "Stub.System.Data.SQLite.Core.NetFramework": {
               "target": "Package",
               "version": "[1.0.118, )"

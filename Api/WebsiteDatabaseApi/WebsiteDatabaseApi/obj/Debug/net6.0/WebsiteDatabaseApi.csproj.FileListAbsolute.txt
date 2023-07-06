@@ -35,3 +35,4 @@ C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebs
 C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebsite\Api\WebsiteDatabaseApi\WebsiteDatabaseApi\bin\Debug\net6.0\Microsoft.Extensions.Configuration.dll
 C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebsite\Api\WebsiteDatabaseApi\WebsiteDatabaseApi\bin\Debug\net6.0\Microsoft.Extensions.Configuration.Abstractions.dll
 C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebsite\Api\WebsiteDatabaseApi\WebsiteDatabaseApi\bin\Debug\net6.0\Microsoft.Extensions.Primitives.dll
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebsite\Api\WebsiteDatabaseApi\WebsiteDatabaseApi\bin\Debug\net6.0\SixLabors.ImageSharp.dll

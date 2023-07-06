@@ -6,3 +6,11 @@ C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\GenerateHash\Has
 C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\GenerateHash\HashGenerator\HashGenerator\obj\Debug\HashGenerator.csproj.CoreCompileInputs.cache
 C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\GenerateHash\HashGenerator\HashGenerator\obj\Debug\HashGenerator.exe
 C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\GenerateHash\HashGenerator\HashGenerator\obj\Debug\HashGenerator.pdb
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebsite\workplace (ideas, snippets and so on)\codesnippets\GenerateHash\HashGenerator\HashGenerator\bin\Debug\HashGenerator.exe.config
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebsite\workplace (ideas, snippets and so on)\codesnippets\GenerateHash\HashGenerator\HashGenerator\bin\Debug\HashGenerator.exe
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebsite\workplace (ideas, snippets and so on)\codesnippets\GenerateHash\HashGenerator\HashGenerator\bin\Debug\HashGenerator.pdb
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebsite\workplace (ideas, snippets and so on)\codesnippets\GenerateHash\HashGenerator\HashGenerator\obj\Debug\HashGenerator.csproj.AssemblyReference.cache
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebsite\workplace (ideas, snippets and so on)\codesnippets\GenerateHash\HashGenerator\HashGenerator\obj\Debug\HashGenerator.csproj.SuggestedBindingRedirects.cache
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebsite\workplace (ideas, snippets and so on)\codesnippets\GenerateHash\HashGenerator\HashGenerator\obj\Debug\HashGenerator.csproj.CoreCompileInputs.cache
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebsite\workplace (ideas, snippets and so on)\codesnippets\GenerateHash\HashGenerator\HashGenerator\obj\Debug\HashGenerator.exe
+C:\Users\marti\OneDrive - TEC\Documents\Martins Coding Projects\E-commerenceWebsite\workplace (ideas, snippets and so on)\codesnippets\GenerateHash\HashGenerator\HashGenerator\obj\Debug\HashGenerator.pdb

@@ -1,7 +1,3 @@
-(function jsLoaded() {
-    console.log("js is loaded!")
-})();
-
 document.getElementById("fileForm").addEventListener("submit", function (event) {
     event.preventDefault();
 
@@ -17,11 +13,22 @@ document.getElementById("fileForm").addEventListener("submit", function (event) 
             for (let pair of formData.entries()) {
                 console.log(pair[0], pair[1]);
             }
-        }
-        else {
-            alert("Please submit a jpeg file, other file types are not allowed.")
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', 'your-api-endpoint-url', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // Request successful, handle the response
+                    let response = JSON.parse(xhr.responseText);
+                    console.log(response);
+                }
+            };
+            xhr.send(formData);
         }
     }
+    else {
+        alert("Please submit a jpeg file, other file types are not allowed.")
+    }
+}
 })
 
 function isValidFileType(file) {

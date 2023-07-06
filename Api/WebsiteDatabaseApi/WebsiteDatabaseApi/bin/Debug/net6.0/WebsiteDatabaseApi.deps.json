@@ -10,6 +10,7 @@
         "dependencies": {
           "Dapper": "2.0.143",
           "Microsoft.Extensions.Configuration": "7.0.0",
+          "SixLabors.ImageSharp": "3.0.1",
           "Stub.System.Data.SQLite.Core.NetFramework": "1.0.118",
           "Swashbuckle.AspNetCore": "6.2.3",
           "System.Data.SQLite.Core": "1.0.118"
@@ -66,6 +67,14 @@
           "lib/netstandard2.0/Microsoft.OpenApi.dll": {
             "assemblyVersion": "1.2.3.0",
             "fileVersion": "1.2.3.0"
+          }
+        }
+      },
+      "SixLabors.ImageSharp/3.0.1": {
+        "runtime": {
+          "lib/net6.0/SixLabors.ImageSharp.dll": {
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.0.1.0"
           }
         }
       },
@@ -194,6 +203,13 @@
       "sha512": "sha512-Nug3rO+7Kl5/SBAadzSMAVgqDlfGjJZ0GenQrLywJ84XGKO0uRqkunz5Wyl0SDwcR71bAATXvSdbdzPrYRYKGw==",
       "path": "microsoft.openapi/1.2.3",
       "hashPath": "microsoft.openapi.1.2.3.nupkg.sha512"
+    },
+    "SixLabors.ImageSharp/3.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-o0v/J6SJwp3RFrzR29beGx0cK7xcMRgOyIuw8ZNLQyNnBhiyL/vIQKn7cfycthcWUPG3XezUjFwBWzkcUUDFbg==",
+      "path": "sixlabors.imagesharp/3.0.1",
+      "hashPath": "sixlabors.imagesharp.3.0.1.nupkg.sha512"
     },
     "Stub.System.Data.SQLite.Core.NetFramework/1.0.118": {
       "type": "package",

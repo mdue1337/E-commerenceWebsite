@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ODcLaLO2yr2TP4EkEXQkDLnEwB+OMTJXmKDag3DcN8xTM+l+WWCg0uxs9ojC70pS/5SxJeeOof03rl6P2cx96w==",
+  "dgSpecHash": "6jH5p6H1LrIy6rF7IiaF2El2zH//dpPTnMFrpAOnpBWg+GnwHBQydjLFYkWiwWn1NHu/7RFVjlMHo1ZD1PfmUw==",
   "success": true,
   "projectFilePath": "C:\\Users\\marti\\OneDrive - TEC\\Documents\\Martins Coding Projects\\E-commerenceWebsite\\Api\\WebsiteDatabaseApi\\WebsiteDatabaseApi\\WebsiteDatabaseApi.csproj",
   "expectedPackageFiles": [
@@ -10,6 +10,7 @@
     "C:\\Users\\marti\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\7.0.0\\microsoft.extensions.configuration.abstractions.7.0.0.nupkg.sha512",
     "C:\\Users\\marti\\.nuget\\packages\\microsoft.extensions.primitives\\7.0.0\\microsoft.extensions.primitives.7.0.0.nupkg.sha512",
     "C:\\Users\\marti\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
+    "C:\\Users\\marti\\.nuget\\packages\\sixlabors.imagesharp\\3.0.1\\sixlabors.imagesharp.3.0.1.nupkg.sha512",
     "C:\\Users\\marti\\.nuget\\packages\\stub.system.data.sqlite.core.netframework\\1.0.118\\stub.system.data.sqlite.core.netframework.1.0.118.nupkg.sha512",
     "C:\\Users\\marti\\.nuget\\packages\\stub.system.data.sqlite.core.netstandard\\1.0.118\\stub.system.data.sqlite.core.netstandard.1.0.118.nupkg.sha512",
     "C:\\Users\\marti\\.nuget\\packages\\swashbuckle.aspnetcore\\6.2.3\\swashbuckle.aspnetcore.6.2.3.nupkg.sha512",

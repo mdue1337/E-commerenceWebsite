@@ -97,6 +97,22 @@
           }
         }
       },
+      "SixLabors.ImageSharp/3.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/SixLabors.ImageSharp.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/SixLabors.ImageSharp.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "build/SixLabors.ImageSharp.props": {}
+        }
+      },
       "Stub.System.Data.SQLite.Core.NetFramework/1.0.118": {
         "type": "package",
         "compile": {
@@ -375,6 +391,22 @@
         "microsoft.openapi.nuspec"
       ]
     },
+    "SixLabors.ImageSharp/3.0.1": {
+      "sha512": "o0v/J6SJwp3RFrzR29beGx0cK7xcMRgOyIuw8ZNLQyNnBhiyL/vIQKn7cfycthcWUPG3XezUjFwBWzkcUUDFbg==",
+      "type": "package",
+      "path": "sixlabors.imagesharp/3.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "build/SixLabors.ImageSharp.props",
+        "lib/net6.0/SixLabors.ImageSharp.dll",
+        "lib/net6.0/SixLabors.ImageSharp.xml",
+        "sixlabors.imagesharp.128.png",
+        "sixlabors.imagesharp.3.0.1.nupkg.sha512",
+        "sixlabors.imagesharp.nuspec"
+      ]
+    },
     "Stub.System.Data.SQLite.Core.NetFramework/1.0.118": {
       "sha512": "oKvqJyhos18gUWQ7DphJwke15HsmXjcfaYm/qymJDkXHraqwDy0BqYMbbwDSJ/bmcbhug3jQEZ1N1FjynGFFyg==",
       "type": "package",
@@ -564,6 +596,7 @@
     "net6.0": [
       "Dapper >= 2.0.143",
       "Microsoft.Extensions.Configuration >= 7.0.0",
+      "SixLabors.ImageSharp >= 3.0.1",
       "Stub.System.Data.SQLite.Core.NetFramework >= 1.0.118",
       "Swashbuckle.AspNetCore >= 6.2.3",
       "System.Data.SQLite.Core >= 1.0.118"
@@ -615,6 +648,10 @@
           "Microsoft.Extensions.Configuration": {
             "target": "Package",
             "version": "[7.0.0, )"
+          },
+          "SixLabors.ImageSharp": {
+            "target": "Package",
+            "version": "[3.0.1, )"
           },
           "Stub.System.Data.SQLite.Core.NetFramework": {
             "target": "Package",
