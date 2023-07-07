@@ -18,46 +18,113 @@ namespace WebsiteDatabaseApi.Controllers
             _db = db;
         }
 
-        [HttpPost("CreateListing")]
-        public async Task<IActionResult> CreateListing(string Name, int CategoryId, double Price, int Stock, string categoryColor, string categorySize, string categoryBrand, IFormFile picture)
+        [HttpGet("GetAllProducts")]
+        public IActionResult GetAllProducts()
         {
-            if(CategoryId > 2 || CategoryId < 1)
-            {
-                return BadRequest("No CategoryId withing range");
-            }
+            return Ok(_db.GetAllProducts());
+        }
 
-            if (picture == null || picture.Length == 0)
-            {
-                return BadRequest("No picture file was uploaded.");
-            }
+        [HttpGet("GetAllProductsByCategory")]
+        public IActionResult GetAllProductsByCategory(int category)
+        {
+            List<ProductsModel> products = _db.GetAllProducts();
+            bool foundMatch = false;
 
-            using (var memoryStream = new MemoryStream())
+            foreach (var product in products)
             {
-                await picture.CopyToAsync(memoryStream);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-
-                using (var image = Image.Load(memoryStream))
+                if (product.CategoryId == category)
                 {
-                    // image.Mutate(x => x.Resize(500, 500));
-                    byte[] imageBytes;
-                    using (var outputStream = new MemoryStream())
-                    {
-                        image.Save(outputStream, new JpegEncoder());
-                        imageBytes = outputStream.ToArray();
-                    }
+                    foundMatch = true;
+                }
+            }
 
-                    string potientialErrorMessage = _db.CreateListing(Name, CategoryId, Price, Stock, imageBytes, categoryColor, categorySize, categoryBrand);
+            if (!foundMatch)
+            {
+                return BadRequest("CategoryId not found");
+            }
+            else
+            {
+                var productsByCategory = products.Where(x => x.CategoryId == category).ToList();
+                return Ok(productsByCategory);
+            }
+        }
 
-                    if (potientialErrorMessage == null) 
+        [HttpGet("GetProductById")]
+        public IActionResult GetProductById(int productId)
+        {
+            // Does product exist?
+            if(_db.CheckIfProductExist(productId) == true)
+            {
+                var products = _db.GetAllProducts();
+                var product = products.Where(x => x.Id == productId).ToList();
+                return Ok(product);
+            }
+            else
+            {
+                return BadRequest("Product does not exist");
+            }
+        }
+
+        [HttpPost("CreateListingClothes")]
+        public async Task<IActionResult> ListingClothes(string Name, double Price, string Color, string Brand, IFormFile picture, [FromForm] int[] sizes)
+        {
+            if (sizes == null || sizes.Length == 0 || picture == null || picture.Length == 0)
+            {
+                BadRequest("Picture or size array is not suffient");
+            }
+            if (sizes.Length == 4)
+            {
+                try
+                {
+                    using (var memoryStream = new MemoryStream())
                     {
-                        return Ok("Picture stored in database");
-                    }
-                    else
-                    {
-                        return BadRequest(potientialErrorMessage);
+                        await picture.CopyToAsync(memoryStream);
+                        memoryStream.Seek(0, SeekOrigin.Begin);
+
+                        using (var image = Image.Load(memoryStream))
+                        {
+                            // image.Mutate(x => x.Resize(500, 500));
+                            byte[] imageBytes;
+                            using (var outputStream = new MemoryStream())
+                            {
+                                image.Save(outputStream, new JpegEncoder());
+                                imageBytes = outputStream.ToArray();
+                            }
+                            string potientialErrorMessage = _db.CreateListingClothes(sizes, Color, Brand, Name, Price, imageBytes);
+                            if(potientialErrorMessage == null)
+                            {
+                                return Ok("Listing created");
+                            }
+                            else
+                            {
+                                return BadRequest();
+                            }
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.ToString());
+                }
+            }
+            else
+            {
+                return BadRequest("size array does not contain excatly 4 elements");
             }
         }
     }
+
+    /*[HttpPost("CreateListingShoes")]
+    public async Task<IActionResult> ListingClothes(string Name, double Price, string Color, string Brand, IFormFile picture, [FromForm] int[] sizes)
+    {
+        int CategoryId = 1;
+
+        // Create ShoesPropoerties table
+
+        // Create ShoesSizes table
+
+        // Create listing
+
+        return Ok()
+    }*/
 }

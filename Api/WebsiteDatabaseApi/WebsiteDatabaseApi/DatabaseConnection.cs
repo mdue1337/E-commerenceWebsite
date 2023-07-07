@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
+using System.Transactions;
 
 namespace WebsiteDatabaseApi
 {
@@ -51,29 +52,49 @@ namespace WebsiteDatabaseApi
             }
         }
 
-        public string CreateListing(string Name, int CategoryId, double Price, int Stock, byte[] ImageBytes, string categoryColor, string categorySize, string categoryBrand)
+        public string CreateListingClothes(int[] sizes, string color, string brand, string name, double price, byte[] picture)
         {
             using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
                 try
                 {
-                    if (CategoryId == 1)
+                    int categoryId = 1;
+
+                    cnn.Open();
+
+                    using (IDbTransaction transaction = cnn.BeginTransaction())
                     {
-                        string ClothingColor = categoryColor;
-                        string ClothingSize = categorySize;
-                        string ClothingBrand = categoryBrand;
-                        string sql = "INSERT INTO Products (Name, CategoryId, Price, Stock, PictureBytes, ClothingColor, ClothingSize, ClothingBrand) VALUES (@Name, @CategoryId, @Price, @Stock, @PictureBytes, @ClothingColor, @ClothingSize, @ClothingBrand)";
-                        cnn.Execute(sql, new { Name = Name, CategoryId = CategoryId, Price = Price, Stock = Stock, PictureBytes = ImageBytes, ClothingColor = ClothingColor, ClothingSize = ClothingSize, ClothingBrand = ClothingBrand });
+                        try
+                        {
+                            string sql1 = "INSERT INTO ClothingSizes (Small, Medium, Large, XL) VALUES (@Small, @Medium, @Large, @XL); SELECT last_insert_rowid();";
+                            int ClothingSizeId = cnn.QuerySingleOrDefault<int>(sql1, new { Small = sizes[0], Medium = sizes[1], Large = sizes[2], XL = sizes[3] });
+
+                            if (ClothingSizeId == 0)
+                            {
+                                throw new Exception("Failed to retrieve id");
+                            }
+
+                            string sql2 = "INSERT INTO ClothingProperties (SizeId, Color, Brand) VALUES (@SizeId, @Color, @Brand); SELECT last_insert_rowid();";
+                            int ClothingPropertiesId = cnn.QuerySingleOrDefault<int>(sql2, new { SizeId = ClothingSizeId, Color = color, Brand = brand });
+
+                            if (ClothingPropertiesId == 0)
+                            {
+                                throw new Exception("Failed to retrieve id");
+                            }
+
+                            string sql3 = "INSERT INTO Products (Name, CategoryId, Price, PictureBytes, ClothingPropertiesId) VALUES (@Name, @CategoryId, @Price, @PictureBytes, @ClothingPropertiesId)";
+                            cnn.Execute(sql3, new { Name = name, CategoryId = categoryId, Price = price, PictureBytes = picture, ClothingPropertiesId = ClothingPropertiesId });
+
+                            transaction.Commit();
+                            cnn.Close();
+                            return null;
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            return ex.ToString();
+                        }
                     }
-                    else if (CategoryId == 2)
-                    {
-                        string ShoesColor = categoryColor;
-                        int ShoesSize = int.Parse(categorySize);
-                        string ShoesBrand = categoryBrand;
-                        string sql = "INSERT INTO Products (Name, CategoryId, Price, Stock, PictureBytes, ShoesColor, ShoesSize, ShoesBrand) VALUES (@Name, @CategoryId, @Price, @Stock, @PictureBytes, @ShoesColor, @ShoesSize, @ShoesBrand)";
-                        cnn.Execute(sql, new { Name = Name, CategoryId = CategoryId, Price = Price, Stock = Stock, PictureBytes = ImageBytes, ShoesColor = ShoesColor, ShoesSize = ShoesSize, ShoesBrand = ShoesBrand });
-                    }
-                    return null;
                 }
                 catch (Exception ex)
                 {
@@ -82,84 +103,94 @@ namespace WebsiteDatabaseApi
             }
         }
 
-        public List<ProductsModel> GetProductByCategoryAndAllSizes(int CategoryId)
+        public List<ProductsModel> GetAllProducts()
         {
             using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
-                var products = GetProductsByCategory(CategoryId);
-                var productListType = products.GetType().GetGenericArguments()[0];
-
-                var output = new List<ProductsModel>();
-
-                if (productListType == typeof(ClothingProductModel))
+                cnn.Open();
+                try
                 {
-                    output = cnn.Query<ClothingProductModel>("").ToList<ProductsModel>();
-                }
-                else if (productListType == typeof(ShoesProductModel))
-                {
-                    output = cnn.Query<ShoesProductModel>("").ToList<ProductsModel>();
-                }
-                
-                return output;
-            }
-        }
-
-        public List<ProductsModel> GetProductsByCategory(int categoryId)
-        {
-            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
-            {
-                string sql = "SELECT * FROM Products WHERE CategoryId = @CategoryId";
-                var products = cnn.Query<ProductsModel>(sql, new { CategoryId = categoryId }).ToList();
-
-                var mappedProducts = new List<ProductsModel>();
-
-                foreach (var product in products)
-                {
-                    ProductsModel mappedProduct = categoryId switch
+                    using (IDbTransaction transaction = cnn.BeginTransaction())
                     {
-                        // Clothing category
-                        1 => MapToClothingProduct(cnn.Query<ClothingProductModel>(sql, new { CategoryId = categoryId, ProductId = product.Id }).FirstOrDefault()),
-                        // Shoes category
-                        2 => MapToShoesProduct(cnn.Query<ShoesProductModel>(sql, new { CategoryId = categoryId, ProductId = product.Id }).FirstOrDefault()),
-                        _ => product // Default to the base Products model
-                    };
-                    mappedProducts.Add(mappedProduct);
-                }
+                        string sql = "SELECT * FROM Products";
+                        List<ProductsModel> output = cnn.Query<ProductsModel>(sql).ToList();
+                        List<ProductsModel> itemsToRemove = new List<ProductsModel>();
 
-                return mappedProducts;
+                        foreach (var product in output)
+                        {
+                            if (product.CategoryId == 1)
+                            {
+                                string _sql = "SELECT * FROM ClothingProperties WHERE Id = @ClothingPropertiesId";
+                                ClothingProperties clothingProperties = cnn.QueryFirstOrDefault<ClothingProperties>(_sql, new { ClothingPropertiesId = product.ClothingPropertiesId });
+
+                                string _sql2 = "SELECT SizeId FROM ClothingProperties WHERE Id = @ClothingPropertiesId";
+                                int sizeId = cnn.QueryFirstOrDefault<int>(_sql2, new { ClothingPropertiesId = product.ClothingPropertiesId });
+
+                                string _sql3 = "SELECT * FROM ClothingSizes WHERE Id = @SizeId";
+                                ClothingSizes clothingSizes = cnn.QueryFirstOrDefault<ClothingSizes>(_sql3, new { SizeId = sizeId });
+
+                                product.ClothingPropertiesId = clothingProperties.Id;
+                                product.ClothingProperties = clothingProperties;
+                                product.ClothingSizes = clothingSizes;
+
+                                product.ShoesPropertiesId = null;
+                                product.ShoesSizes = null;
+                                product.ShoesProperties = null;
+                            }
+                            else if (product.CategoryId == 2)
+                            {
+                                string _sql = "SELECT * FROM ShoesProperties WHERE Id = @ShoesPropertiesId";
+                                ShoesProperties ShoesProperties = cnn.QueryFirstOrDefault<ShoesProperties>(_sql, new { ShoesPropertiesId = product.ShoesPropertiesId });
+
+                                string _sql2 = "SELECT SizeId FROM ShoesProperties WHERE Id = @ShoesPropertiesId";
+                                int sizeId = cnn.QueryFirstOrDefault<int>(_sql2, new { ShoesPropertiesId = product.ShoesPropertiesId });
+
+                                string _sql3 = "SELECT * FROM ShoesSizes WHERE Id = @SizeId";
+                                ShoesSizes ShoesSizes = cnn.QueryFirstOrDefault<ShoesSizes>(_sql3, new { SizeId = sizeId });
+
+                                product.ShoesPropertiesId = ShoesProperties.Id;
+                                product.ShoesProperties = ShoesProperties;
+                                product.ShoesSizes = ShoesSizes;
+
+                                product.ClothingPropertiesId = null;
+                                product.ClothingSizes = null;
+                                product.ClothingProperties = null;
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+
+                        transaction.Commit();
+                        return output;
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
             }
         }
 
-        private ClothingProductModel MapToClothingProduct(ProductsModel product)
+        public bool CheckIfProductExist(int productId)
         {
-            return new ClothingProductModel
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
-                Id = product.Id,
-                Name = product.Name,
-                CategoryId = product.CategoryId,
-                Price = product.Price,
-                Stock = product.Stock,
-                PictureBytes = product.PictureBytes,
-                ClothingColor = ((ClothingProductModel)product).ClothingColor,
-                ClothingSize = ((ClothingProductModel)product).ClothingSize,
-                ClothingBrand = ((ClothingProductModel)product).ClothingBrand
-            };
+                string sql = "SELECT COUNT(*) FROM Products WHERE Id = @Id";
+                var num = cnn.QueryFirstOrDefault<int>(sql, new { Id = productId });
+
+                if (num == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
-        private ShoesProductModel MapToShoesProduct(ProductsModel product)
-        {
-            return new ShoesProductModel
-            {
-                Id = product.Id,
-                Name = product.Name,
-                CategoryId = product.CategoryId,
-                Price = product.Price,
-                Stock = product.Stock,
-                PictureBytes = product.PictureBytes,
-                ShoesColor = ((ShoesProductModel)product).ShoesColor,
-                ShoesSize = ((ShoesProductModel)product).ShoesSize,
-                ShoesBrand = ((ShoesProductModel)product).ShoesBrand
-            };
-        }
+        // Skal fixes - start med at hente produkterne, så kan du derefter bare lave LinQ?
     }
 }
