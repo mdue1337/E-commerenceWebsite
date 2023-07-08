@@ -1,0 +1,30 @@
+Review querys
+	- create review
+	- get review for product (join table?)
+
+Product querys
+	- get all products
+	- productcategorys
+	- by id
+	- create product, clothing and shoes
+
+User querys
+	- create user
+	- delete user
+	- admin user? seller user
+
+Wishlist querys
+	- add to wishlist
+	- remove from wishlist
+
+Cart querys
+	- add to cart
+	- remove from cart
+	- go to payment, will delete items in cart and update the stock associated
+
+Seller dashboard?
+	- recently sold products
+	- earnings
+	- user rating for products
+	- amount of regristred users
+	- amount of wishlisted items in category
