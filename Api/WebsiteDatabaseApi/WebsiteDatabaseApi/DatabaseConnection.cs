@@ -114,7 +114,6 @@ namespace WebsiteDatabaseApi
                     {
                         string sql = "SELECT * FROM Products";
                         List<ProductsModel> output = cnn.Query<ProductsModel>(sql).ToList();
-                        List<ProductsModel> itemsToRemove = new List<ProductsModel>();
 
                         foreach (var product in output)
                         {
