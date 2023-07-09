@@ -65,6 +65,19 @@ namespace WebsiteDatabaseApi.Controllers
             }
         }
 
+        [HttpGet("GetReviewsForProduct")]
+        public IActionResult GetAllReviewsForProduct(int productId)
+        {
+            try
+            {
+                return Ok(_db.ReviewsForProduct(productId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost("CreateListingClothes")]
         public async Task<IActionResult> CreateListingClothes(string Name, double Price, string Color, string Brand, IFormFile picture, [FromForm] int[] sizes)
         {
@@ -120,6 +133,7 @@ namespace WebsiteDatabaseApi.Controllers
             {
                 BadRequest("Picture or size array is not suffient");
             }
+
             if (sizes.Length == 9)
             {
                 try
@@ -160,5 +174,28 @@ namespace WebsiteDatabaseApi.Controllers
                 return BadRequest("size array does not contain excatly 4 elements");
             }
         }
+        [HttpPost("CreateReview")]
+        public IActionResult CreateReview(int productId, int userId, int rating, [FromQuery] string? text = null)
+        {
+            string timestamp = DateTime.UtcNow.ToString();
+
+            if(_db.CheckIfProductExist(productId) != true)
+            {
+                BadRequest("ProductId does not exist");
+            }
+            if(_db.CheckIfUserExist(userId) != true)
+            {
+                BadRequest("UserId does not exist");
+            }
+            if(rating > 5 || rating < 0)
+            {
+                BadRequest("rating too high or too low");
+            }
+            
+            _db.CreateReview(productId, userId, rating, text, timestamp);
+
+            return Ok("Created with timestamp: " + timestamp);
+        }
+
     }
 }

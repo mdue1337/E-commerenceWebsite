@@ -7,7 +7,7 @@ public class Program
     public static void Main()
     {
         // Hash obtained from JavaScript
-        string hashedPassword = "2jmj7l5rSw0yVb/vlWAYkK/YBwk=";
+        string hashedPassword = "Password123";
 
         // Create a new instance of the SHA256 algorithm
         using (SHA256 sha256Hash = SHA256.Create())

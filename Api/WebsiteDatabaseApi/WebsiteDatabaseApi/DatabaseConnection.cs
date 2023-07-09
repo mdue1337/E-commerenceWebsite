@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
@@ -8,6 +9,8 @@ using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using System.Transactions;
 using System.Xml;
 
@@ -24,6 +27,48 @@ namespace WebsiteDatabaseApi
 
         // User querys.
 
+        public void CreateUser(string firstName, string lastName, string street, int streetNum, string city, int postNum, string email, string password)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                // Convert the hash to bytes
+                byte[] bytes = Encoding.UTF8.GetBytes(password);
+
+                // Compute the hash
+                byte[] hashedBytes = sha256Hash.ComputeHash(bytes);
+
+                // Convert the hashed bytes to a string
+                string finalHash = BitConverter.ToString(hashedBytes).Replace("-", string.Empty).ToLower();
+
+                password = finalHash;
+            }
+
+            UserModel user = new UserModel()
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Street = street,
+                StreetNumber = streetNum,
+                City = city,
+                PostNumber = postNum,
+                Email = email,
+                Password = password
+            };
+
+            try
+            {
+                using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+                {
+                    string sql = "INSERT INTO Users (FirstName, LastName, Street, StreetNumber, City, PostNumber, Email, Password) VALUES (@FirstName, @LastName, @Street, @StreetNumber, @City, @PostNumber, @Email, @Password)";
+                    cnn.Execute(sql, user);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
         public List<UserModel> LoadUsers()
         {
             using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
@@ -34,26 +79,55 @@ namespace WebsiteDatabaseApi
             }
         }
 
-        public void CreateUser(string FirstName, string LastName, string Street, int StreetNumber, string City, int PostNumber, string Email)
+        public void DeleteUser(int userId)
         {
             using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
-                string sql = "INSERT INTO Users (FirstName, LastName, Street, StreetNumber, City, PostNumber, Email) VALUES (@FirstName, @LastName, @Street, @StreetNumber, @City, @PostNumber, @Email)";
-                cnn.Execute(sql, new { FirstName = FirstName, LastName = LastName, Street = Street, StreetNumber = StreetNumber, City = City, PostNumber = PostNumber, Email = Email });
+                string sql = "DELETE FROM Users WHERE Users.Id = @Id";
+                cnn.Execute(sql, new { Id = userId });
+            }
+        }
+
+        public bool CheckIfUserExist(int userId)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = "SELECT COUNT(*) FROM Users WHERE Id = @Id";
+                var num = cnn.QueryFirstOrDefault<int>(sql, new { Id = userId });
+
+                if (num == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        // Review querys.
+
+        public void CreateReview(int productId, int userId, int rating, string text, string timestamp)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = "INSERT INTO Review (ProductId, UserId, Rating, Text, Timestamp) VALUES (@ProductId, @UserId, @Rating, @Text, @Timestamp)";
+                cnn.Execute(sql, new { ProductId = productId, UserId = userId, Rating = rating, Text = text, Timestamp = timestamp });
+            }
+        }
+
+        public List<ReviewModel> ReviewsForProduct(int productId)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = "SELECT * FROM Review WHERE Review.ProductId = @Id";
+                var output = cnn.Query<ReviewModel>(sql, new { Id = productId });
+                return output.ToList();
             }
         }
 
         // Product querys.
-
-        public List<ReviewModel> ReviewsForProduct(int Id)
-        {
-            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
-            {
-                string sql = "SELECT * FROM Review INNER JOIN Products ON Review.ProductId = @Id";
-                var output = cnn.Query<ReviewModel>(sql, new { Id = Id });
-                return output.ToList();
-            }
-        }
 
         public string CreateListingClothes(int[] sizes, string color, string brand, string name, double price, byte[] picture)
         {
@@ -244,7 +318,5 @@ namespace WebsiteDatabaseApi
                 }
             }
         }
-
-        // Skal fixes - start med at hente produkterne, så kan du derefter bare lave LinQ?
     }
 }

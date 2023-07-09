@@ -30,12 +30,26 @@ namespace WebsiteDatabaseApi.Controllers
         }
 
         [HttpPost("CreateUser")]
-        public IActionResult CreateUser(string FirstName, string LastName, string Street, int StreetNumber, string City, int PostNumber, string Email)
+        public IActionResult CreateUser(string FirstName, string LastName, string Street, int StreetNumber, string City, int PostNumber, string Email, string password)
         {
             try
             {
-                _db.CreateUser(FirstName, LastName, Street, StreetNumber, City, PostNumber, Email);
+                _db.CreateUser(FirstName, LastName, Street, StreetNumber, City, PostNumber, Email, password);
                 return Ok("User created");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("DeleteUserId")]
+        public IActionResult DeleteUser(int userId)
+        {
+            try
+            {
+                _db.DeleteUser(userId);
+                return Ok("User deleted");
             }
             catch (Exception ex)
             {

@@ -1,16 +1,17 @@
 Review querys
-	- create review
-	- get review for product (join table?)
+	- create review ^j
+	- get review for product ^j
 
 Product querys
-	- get all products
-	- productcategorys
-	- by id
-	- create product, clothing and shoes
+	- get all products ^j
+		- sort by category or id ^j
+	- create product, clothing and shoes ^j
 
 User querys
-	- create user
-	- delete user
+	- create user ^j
+	- check if user exist ^j
+	- get all users ^j
+	- delete user ^j
 	- admin user? seller user
 
 Wishlist querys
@@ -23,8 +24,10 @@ Cart querys
 	- go to payment, will delete items in cart and update the stock associated
 
 Seller dashboard?
-	- recently sold products
-	- earnings
+	- recently sold products 
+		- (SELECT * FROM YourTable WHERE ROWID = last_insert_rowid())
+	- earnings (add colum? new table?)
 	- user rating for products
 	- amount of regristred users
+		- check for number of rows in users tabler
 	- amount of wishlisted items in category
