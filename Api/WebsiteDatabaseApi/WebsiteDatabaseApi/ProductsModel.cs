@@ -1,17 +1,26 @@
-﻿namespace WebsiteDatabaseApi
+﻿using System.Text.Json.Serialization;
+
+namespace WebsiteDatabaseApi
 {
-    public class ProductsModel
+    public class ProductsModel 
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public int CategoryId { get; set; }
         public double Price { get; set; }
         public byte[] PictureBytes { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? ClothingPropertiesId { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? ShoesPropertiesId { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ClothingSizes ClothingSizes { get; internal set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ClothingProperties ClothingProperties { get; internal set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ShoesSizes ShoesSizes { get; internal set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ShoesProperties ShoesProperties { get; internal set; }
     }
 

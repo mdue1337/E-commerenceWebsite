@@ -53,7 +53,7 @@ namespace WebsiteDatabaseApi.Controllers
         public IActionResult GetProductById(int productId)
         {
             // Does product exist?
-            if(_db.CheckIfProductExist(productId) == true)
+            if (_db.CheckIfProductExist(productId) == true)
             {
                 var products = _db.GetAllProducts();
                 var product = products.Where(x => x.Id == productId).ToList();
@@ -66,7 +66,7 @@ namespace WebsiteDatabaseApi.Controllers
         }
 
         [HttpPost("CreateListingClothes")]
-        public async Task<IActionResult> ListingClothes(string Name, double Price, string Color, string Brand, IFormFile picture, [FromForm] int[] sizes)
+        public async Task<IActionResult> CreateListingClothes(string Name, double Price, string Color, string Brand, IFormFile picture, [FromForm] int[] sizes)
         {
             if (sizes == null || sizes.Length == 0 || picture == null || picture.Length == 0)
             {
@@ -91,7 +91,55 @@ namespace WebsiteDatabaseApi.Controllers
                                 imageBytes = outputStream.ToArray();
                             }
                             string potientialErrorMessage = _db.CreateListingClothes(sizes, Color, Brand, Name, Price, imageBytes);
-                            if(potientialErrorMessage == null)
+                            if (potientialErrorMessage == null)
+                            {
+                                return Ok("Listing created");
+                            }
+                            else
+                            {
+                                return BadRequest();
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.ToString());
+                }
+            }
+            else
+            {
+                return BadRequest("size array does not contain excatly 4 elements");
+            }
+        }
+
+        [HttpPost("CreateListingShoes")]
+        public async Task<IActionResult> CreateListingShoes(string Name, double Price, string Color, string Brand, IFormFile picture, [FromForm] int[] sizes)
+        {
+            if (sizes == null || sizes.Length == 0 || picture == null || picture.Length == 0)
+            {
+                BadRequest("Picture or size array is not suffient");
+            }
+            if (sizes.Length == 9)
+            {
+                try
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await picture.CopyToAsync(memoryStream);
+                        memoryStream.Seek(0, SeekOrigin.Begin);
+
+                        using (var image = Image.Load(memoryStream))
+                        {
+                            // image.Mutate(x => x.Resize(500, 500));
+                            byte[] imageBytes;
+                            using (var outputStream = new MemoryStream())
+                            {
+                                image.Save(outputStream, new JpegEncoder());
+                                imageBytes = outputStream.ToArray();
+                            }
+                            string potientialErrorMessage = _db.CreateListingShoes(sizes, Color, Brand, Name, Price, imageBytes);
+                            if (potientialErrorMessage == null)
                             {
                                 return Ok("Listing created");
                             }
@@ -113,18 +161,4 @@ namespace WebsiteDatabaseApi.Controllers
             }
         }
     }
-
-    /*[HttpPost("CreateListingShoes")]
-    public async Task<IActionResult> ListingClothes(string Name, double Price, string Color, string Brand, IFormFile picture, [FromForm] int[] sizes)
-    {
-        int CategoryId = 1;
-
-        // Create ShoesPropoerties table
-
-        // Create ShoesSizes table
-
-        // Create listing
-
-        return Ok()
-    }*/
 }

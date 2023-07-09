@@ -1,12 +1,15 @@
 ﻿using Dapper;
 using System;
 using System.Buffers.Text;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
+using System.Reflection;
 using System.Transactions;
+using System.Xml;
 
 namespace WebsiteDatabaseApi
 {
@@ -103,6 +106,57 @@ namespace WebsiteDatabaseApi
             }
         }
 
+        public string CreateListingShoes(int[] sizes, string color, string brand, string name, double price, byte[] picture)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                try
+                {
+                    int categoryId = 2;
+
+                    cnn.Open();
+
+                    using (IDbTransaction transaction = cnn.BeginTransaction())
+                    {
+                        try
+                        {
+                            string sql1 = "INSERT INTO ShoesSizes (Size38, Size39, Size40, Size41, Size42, Size43, Size44, Size45, Size46) VALUES (@Size38, @Size39, @Size40, @Size41, @Size42, @Size43, @Size44, @Size45, @Size46); SELECT last_insert_rowid();";
+                            int ShoesSizeId = cnn.QuerySingleOrDefault<int>(sql1, new { Size38 = sizes[0], Size39 = sizes[1], Size40 = sizes[2], Size41 = sizes[3], Size42 = sizes[4], Size43 = sizes[5], Size44 = sizes[6], Size45 = sizes[7], Size46 = sizes[8] });
+
+                            if (ShoesSizeId == 0)
+                            {
+                                throw new Exception("Failed to retrieve id");
+                            }
+
+                            string sql2 = "INSERT INTO ShoesProperties (SizeId, Color, Brand) VALUES (@SizeId, @Color, @Brand); SELECT last_insert_rowid();";
+                            int ShoesPropertiesId = cnn.QuerySingleOrDefault<int>(sql2, new { SizeId = ShoesSizeId, Color = color, Brand = brand });
+
+                            if (ShoesPropertiesId == 0)
+                            {
+                                throw new Exception("Failed to retrieve id");
+                            }
+
+                            string sql3 = "INSERT INTO Products (Name, CategoryId, Price, PictureBytes, ShoesPropertiesId) VALUES (@Name, @CategoryId, @Price, @PictureBytes, @ShoesPropertiesId)";
+                            cnn.Execute(sql3, new { Name = name, CategoryId = categoryId, Price = price, PictureBytes = picture, ShoesPropertiesId = ShoesPropertiesId });
+
+                            transaction.Commit();
+                            cnn.Close();
+                            return null;
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            return ex.ToString();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return ex.ToString();
+                }
+            }
+        }
+
         public List<ProductsModel> GetAllProducts()
         {
             using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
@@ -114,6 +168,7 @@ namespace WebsiteDatabaseApi
                     {
                         string sql = "SELECT * FROM Products";
                         List<ProductsModel> output = cnn.Query<ProductsModel>(sql).ToList();
+                        IDictionary<string, object> result = new Dictionary<string, object>();
 
                         foreach (var product in output)
                         {
