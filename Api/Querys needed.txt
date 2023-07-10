@@ -1,12 +1,13 @@
 Review querys
 	- create review ^j
 	- get review for product ^j
-		- update average rating for seller
+		- update average rating for seller ^j
 
 Product querys
 	- get all products ^j
 		- sort by category or id ^j
 	- create product, clothing and shoes ^j
+	- remove product
 	- size out of stock checker.
 
 User querys
@@ -14,24 +15,16 @@ User querys
 	- check if user exist ^j
 	- get all users ^j
 	- delete user ^j
-	- create seller user
-	- delete seller user
+	- create seller user ^j
+	- delete seller user ^j
 
 Wishlist querys
 	- add to wishlist
 	- remove from wishlist
+	- get wishlist
 
 Cart querys
 	- add to cart ^j
-	- remove from cart 
+	- remove from cart ^j
 	- go to payment, will delete items in cart and update the stock associated ^j
-	- update sellerinformation table
-
-Seller dashboard? - work in progess, table is created. Just need to update values.
-
-	- recently sold products 
-	- earnings
-	- user rating for products // maybe, probally not
-	- amount of regristred users
-		- check for number of rows in users tabler
-	- amount of wishlisted items in category
+		- update sellerinformation table

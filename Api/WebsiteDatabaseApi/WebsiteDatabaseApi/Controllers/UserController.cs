@@ -43,12 +43,72 @@ namespace WebsiteDatabaseApi.Controllers
             }
         }
 
+        [HttpPost("CreateSeller")]
+        public IActionResult CreateSeller(string FullName, string email, string phone, string password)
+        {
+            try
+            {
+                _db.CreateSeller(FullName, email, phone, password);
+                return Ok("User created");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("CalcSellerReviewRating")]
+        public IActionResult CalcRatingReview(int sellerId)
+        {
+            try
+            {
+                if(_db.CheckIfSellerExist(sellerId) == false)
+                {
+                    return BadRequest("SellerId does not exist");
+                }
+                double rating = _db.CalcReviewAverageRatingForSeller(sellerId);
+                return Ok("Rating for seller is: " + rating);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("RemoveProductFromCart")]
+        public IActionResult RemoveProductFromCart(int userId, int productId)
+        {
+            try
+            {
+                _db.RemoveProductFromCart(userId, productId);
+                return Ok("Product removed");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpDelete("DeleteUserId")]
         public IActionResult DeleteUser(int userId)
         {
             try
             {
                 _db.DeleteUser(userId);
+                return Ok("User deleted");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("DeleteSellerId")]
+        public IActionResult DeleteSeller(int sellerId)
+        {
+            try
+            {
+                _db.DeleteSeller(sellerId);
                 return Ok("User deleted");
             }
             catch (Exception ex)

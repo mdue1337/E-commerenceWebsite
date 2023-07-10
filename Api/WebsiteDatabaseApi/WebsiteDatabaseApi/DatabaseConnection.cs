@@ -108,14 +108,47 @@ namespace WebsiteDatabaseApi
 
         // Seler query's
 
-        public void CreateSeller()
+        public void CreateSeller(string FullName, string email, string phone, string password)
         {
-            // Create empty SellerInformation tab
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                // Convert the hash to bytes
+                byte[] bytes = Encoding.UTF8.GetBytes(password);
+
+                // Compute the hash
+                byte[] hashedBytes = sha256Hash.ComputeHash(bytes);
+
+                // Convert the hashed bytes to a string
+                string finalHash = BitConverter.ToString(hashedBytes).Replace("-", string.Empty).ToLower();
+
+                password = finalHash;
+            }
+
+            SellerModel seller = new SellerModel()
+            {
+                FullName = FullName,
+                Email = email,
+                Phone = phone,
+                Password = password
+            };
+
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = "INSERT INTO Sellers (FullName, Email, Phone, Password) VALUES (@FullName, @Email, @Phone, @Password); SELECT last_insert_rowid()";
+                int sellerId = cnn.QueryFirstOrDefault<int>(sql, seller);
+
+                string sql2 = "INSERT INTO SellerInformation (SellerId) VALUES (@Id)";
+                cnn.Execute(sql2, new { Id = sellerId });
+            }
         }
 
-        public void DeleteSeller()
+        public void DeleteSeller(int sellerId)
         {
-            // Delete seller
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = "DELETE FROM Sellers WHERE Sellers.Id = @Id";
+                cnn.Execute(sql, new { Id = sellerId });
+            }
         }
 
         public void SellerInformationUpdate(int[] productIds)
@@ -162,9 +195,27 @@ namespace WebsiteDatabaseApi
             }
         }
 
-        public void CalcReviewAverageRating(int sellerId)
+        public double CalcReviewAverageRatingForSeller(int sellerId)
         {
+            List<int> ratings = new();
 
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = "SELECT Rating FROM Products INNER JOIN Sellers, Review ON Products.SellerId = Sellers.Id WHERE Products.SellerId = @Id";
+                ratings = cnn.Query<int>(sql, new { Id = sellerId }).ToList();
+
+                if (ratings.Count == 0)
+                {
+                    throw new Exception("No ratings found");
+                }
+
+                double ratingaverage = ratings.Average(x => x);
+
+                string sql2 = "UPDATE SellerInformation SET SellerAverageReviewRating = @rating WHERE SellerId = " + sellerId;
+                cnn.Execute(sql2, new { rating = ratingaverage });
+
+                return ratingaverage;
+            }
         }
 
         // Product querys.
@@ -366,6 +417,11 @@ namespace WebsiteDatabaseApi
             }
         }
 
+        public void RemoveProduct()
+        {
+
+        }
+
         public void CheckIfProductsAreInStock()
         {
             // if they are at 0 then dont continue idk
@@ -382,9 +438,23 @@ namespace WebsiteDatabaseApi
             }
         }
 
-        public void RemoveProductFromCart()
+        public void RemoveProductFromCart(int userId, int productId)
         {
+            using(IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string _rowsql = "SELECT COUNT(*) FROM Cart";
+                int rows = cnn.QueryFirstOrDefault<int>(_rowsql);
 
+                if (rows == 0)
+                {
+                    throw new Exception("No rows in cart");
+                }
+                else
+                {
+                    string sql = "DELETE FROM Cart WHERE Cart.UserId = @UserId AND Cart.ProductId = @ProductId";
+                    cnn.Execute(sql, new { UserId = userId, ProductId = productId });
+                }
+            }
         }
 
         public List<CartModel> GetCartForUser(int userId)
@@ -460,10 +530,27 @@ namespace WebsiteDatabaseApi
                 }
             }
         }
+
+        // Wishlist
+
+        public void AddToWishlist(int userId, int productId)
+        {
+            
+        }
+
+        public void RemoveFromWishList(int userId, int productId)
+        {
+
+        }
+
+        public List<WishlistModel> GetWishlistForUser()
+        {
+            using(IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = ""; // Define string
+                var output = cnn.Query<WishlistModel>(sql).ToList();
+                return output;
+            }
+        }
     }
-
-        /// Wishlist query
-
-
-        /// Seller dashboard query's
-    }
+}
