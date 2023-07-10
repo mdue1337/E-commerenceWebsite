@@ -21,7 +21,14 @@ namespace WebsiteDatabaseApi.Controllers
         [HttpGet("GetAllProducts")]
         public IActionResult GetAllProducts()
         {
-            return Ok(_db.GetAllProducts());
+            try
+            {
+                return Ok(_db.GetAllProducts());
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet("GetAllProductsByCategory")]
@@ -79,12 +86,18 @@ namespace WebsiteDatabaseApi.Controllers
         }
 
         [HttpPost("CreateListingClothes")]
-        public async Task<IActionResult> CreateListingClothes(string Name, double Price, string Color, string Brand, IFormFile picture, [FromForm] int[] sizes)
+        public async Task<IActionResult> CreateListingClothes(int SellerId, string Name, double Price, string Color, string Brand, IFormFile picture, [FromForm] int[] sizes)
         {
+            if(_db.CheckIfSellerExist(SellerId) == false)
+            {
+                BadRequest("Seller does not exist");
+            }
+
             if (sizes == null || sizes.Length == 0 || picture == null || picture.Length == 0)
             {
                 BadRequest("Picture or size array is not suffient");
             }
+
             if (sizes.Length == 4)
             {
                 try
@@ -103,7 +116,7 @@ namespace WebsiteDatabaseApi.Controllers
                                 image.Save(outputStream, new JpegEncoder());
                                 imageBytes = outputStream.ToArray();
                             }
-                            string potientialErrorMessage = _db.CreateListingClothes(sizes, Color, Brand, Name, Price, imageBytes);
+                            string potientialErrorMessage = _db.CreateListingClothes(sizes, Color, Brand, Name, Price, imageBytes, SellerId);
                             if (potientialErrorMessage == null)
                             {
                                 return Ok("Listing created");
@@ -127,8 +140,13 @@ namespace WebsiteDatabaseApi.Controllers
         }
 
         [HttpPost("CreateListingShoes")]
-        public async Task<IActionResult> CreateListingShoes(string Name, double Price, string Color, string Brand, IFormFile picture, [FromForm] int[] sizes)
+        public async Task<IActionResult> CreateListingShoes(int SellerId, string Name, double Price, string Color, string Brand, IFormFile picture, [FromForm] int[] sizes)
         {
+            if (_db.CheckIfSellerExist(SellerId) == false)
+            {
+                BadRequest("Seller does not exist");
+            }
+
             if (sizes == null || sizes.Length == 0 || picture == null || picture.Length == 0)
             {
                 BadRequest("Picture or size array is not suffient");
@@ -152,7 +170,7 @@ namespace WebsiteDatabaseApi.Controllers
                                 image.Save(outputStream, new JpegEncoder());
                                 imageBytes = outputStream.ToArray();
                             }
-                            string potientialErrorMessage = _db.CreateListingShoes(sizes, Color, Brand, Name, Price, imageBytes);
+                            string potientialErrorMessage = _db.CreateListingShoes(sizes, Color, Brand, Name, Price, imageBytes, SellerId);
                             if (potientialErrorMessage == null)
                             {
                                 return Ok("Listing created");
@@ -197,5 +215,20 @@ namespace WebsiteDatabaseApi.Controllers
             return Ok("Created with timestamp: " + timestamp);
         }
 
+        // Cart
+
+        [HttpPost("UserBuysCart")]
+        public IActionResult UserBuyCart(int userId)
+        {
+            try
+            {
+                _db.UserPaysCart(userId);
+                return Ok("User bought his cart");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

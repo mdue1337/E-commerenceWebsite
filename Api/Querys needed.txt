@@ -1,33 +1,37 @@
 Review querys
 	- create review ^j
 	- get review for product ^j
+		- update average rating for seller
 
 Product querys
 	- get all products ^j
 		- sort by category or id ^j
 	- create product, clothing and shoes ^j
+	- size out of stock checker.
 
 User querys
 	- create user ^j
 	- check if user exist ^j
 	- get all users ^j
 	- delete user ^j
-	- admin user? seller user
+	- create seller user
+	- delete seller user
 
 Wishlist querys
 	- add to wishlist
 	- remove from wishlist
 
 Cart querys
-	- add to cart
-	- remove from cart
-	- go to payment, will delete items in cart and update the stock associated
+	- add to cart ^j
+	- remove from cart 
+	- go to payment, will delete items in cart and update the stock associated ^j
+	- update sellerinformation table
 
-Seller dashboard?
+Seller dashboard? - work in progess, table is created. Just need to update values.
+
 	- recently sold products 
-		- (SELECT * FROM YourTable WHERE ROWID = last_insert_rowid())
-	- earnings (add colum? new table?)
-	- user rating for products
+	- earnings
+	- user rating for products // maybe, probally not
 	- amount of regristred users
 		- check for number of rows in users tabler
 	- amount of wishlisted items in category

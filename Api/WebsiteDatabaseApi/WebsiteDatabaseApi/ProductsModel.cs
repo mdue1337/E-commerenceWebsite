@@ -5,6 +5,7 @@ namespace WebsiteDatabaseApi
     public class ProductsModel 
     {
         public int Id { get; set; }
+        public int SellerId { get; set; }
         public string Name { get; set; }
         public int CategoryId { get; set; }
         public double Price { get; set; }

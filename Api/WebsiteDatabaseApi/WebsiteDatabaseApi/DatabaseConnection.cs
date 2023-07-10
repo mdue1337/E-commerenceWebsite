@@ -106,6 +106,41 @@ namespace WebsiteDatabaseApi
             }
         }
 
+        // Seler query's
+
+        public void CreateSeller()
+        {
+            // Create empty SellerInformation tab
+        }
+
+        public void DeleteSeller()
+        {
+            // Delete seller
+        }
+
+        public void SellerInformationUpdate(int[] productIds)
+        {
+            // Update values....
+        }
+
+        public bool CheckIfSellerExist(int sellerId)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = "SELECT COUNT(*) FROM Sellers WHERE Id = @Id";
+                var num = cnn.QueryFirstOrDefault<int>(sql, new { Id = sellerId });
+
+                if (num == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
         // Review querys.
 
         public void CreateReview(int productId, int userId, int rating, string text, string timestamp)
@@ -127,9 +162,14 @@ namespace WebsiteDatabaseApi
             }
         }
 
+        public void CalcReviewAverageRating(int sellerId)
+        {
+
+        }
+
         // Product querys.
 
-        public string CreateListingClothes(int[] sizes, string color, string brand, string name, double price, byte[] picture)
+        public string CreateListingClothes(int[] sizes, string color, string brand, string name, double price, byte[] picture, int sellerId)
         {
             using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
@@ -159,8 +199,8 @@ namespace WebsiteDatabaseApi
                                 throw new Exception("Failed to retrieve id");
                             }
 
-                            string sql3 = "INSERT INTO Products (Name, CategoryId, Price, PictureBytes, ClothingPropertiesId) VALUES (@Name, @CategoryId, @Price, @PictureBytes, @ClothingPropertiesId)";
-                            cnn.Execute(sql3, new { Name = name, CategoryId = categoryId, Price = price, PictureBytes = picture, ClothingPropertiesId = ClothingPropertiesId });
+                            string sql3 = "INSERT INTO Products (SellerId, Name, CategoryId, Price, PictureBytes, ClothingPropertiesId) VALUES (@SellerId, @Name, @CategoryId, @Price, @PictureBytes, @ClothingPropertiesId)";
+                            cnn.Execute(sql3, new { SellerId = sellerId, Name = name, CategoryId = categoryId, Price = price, PictureBytes = picture, ClothingPropertiesId = ClothingPropertiesId });
 
                             transaction.Commit();
                             cnn.Close();
@@ -180,7 +220,7 @@ namespace WebsiteDatabaseApi
             }
         }
 
-        public string CreateListingShoes(int[] sizes, string color, string brand, string name, double price, byte[] picture)
+        public string CreateListingShoes(int[] sizes, string color, string brand, string name, double price, byte[] picture, int sellerId)
         {
             using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
@@ -210,8 +250,8 @@ namespace WebsiteDatabaseApi
                                 throw new Exception("Failed to retrieve id");
                             }
 
-                            string sql3 = "INSERT INTO Products (Name, CategoryId, Price, PictureBytes, ShoesPropertiesId) VALUES (@Name, @CategoryId, @Price, @PictureBytes, @ShoesPropertiesId)";
-                            cnn.Execute(sql3, new { Name = name, CategoryId = categoryId, Price = price, PictureBytes = picture, ShoesPropertiesId = ShoesPropertiesId });
+                            string sql3 = "INSERT INTO Products (SellerId, Name, CategoryId, Price, PictureBytes, ShoesPropertiesId) VALUES (SellerId, @Name, @CategoryId, @Price, @PictureBytes, @ShoesPropertiesId)";
+                            cnn.Execute(sql3, new { SellerId = sellerId, Name = name, CategoryId = categoryId, Price = price, PictureBytes = picture, ShoesPropertiesId = ShoesPropertiesId });
 
                             transaction.Commit();
                             cnn.Close();
@@ -242,7 +282,6 @@ namespace WebsiteDatabaseApi
                     {
                         string sql = "SELECT * FROM Products";
                         List<ProductsModel> output = cnn.Query<ProductsModel>(sql).ToList();
-                        IDictionary<string, object> result = new Dictionary<string, object>();
 
                         foreach (var product in output)
                         {
@@ -257,9 +296,13 @@ namespace WebsiteDatabaseApi
                                 string _sql3 = "SELECT * FROM ClothingSizes WHERE Id = @SizeId";
                                 ClothingSizes clothingSizes = cnn.QueryFirstOrDefault<ClothingSizes>(_sql3, new { SizeId = sizeId });
 
+                                string _sql4 = "SELECT SellerId FROM Products WHERE Products.Id = @Id";
+                                int sellerId = cnn.QueryFirstOrDefault<int>(_sql4, new { Id = product.Id });
+
                                 product.ClothingPropertiesId = clothingProperties.Id;
                                 product.ClothingProperties = clothingProperties;
                                 product.ClothingSizes = clothingSizes;
+                                product.SellerId = sellerId;
 
                                 product.ShoesPropertiesId = null;
                                 product.ShoesSizes = null;
@@ -276,9 +319,13 @@ namespace WebsiteDatabaseApi
                                 string _sql3 = "SELECT * FROM ShoesSizes WHERE Id = @SizeId";
                                 ShoesSizes ShoesSizes = cnn.QueryFirstOrDefault<ShoesSizes>(_sql3, new { SizeId = sizeId });
 
+                                string _sql4 = "SELECT SellerId FROM Products WHERE Products.Id = @Id";
+                                int sellerId = cnn.QueryFirstOrDefault<int>(_sql4, new { Id = product.Id });
+
                                 product.ShoesPropertiesId = ShoesProperties.Id;
                                 product.ShoesProperties = ShoesProperties;
                                 product.ShoesSizes = ShoesSizes;
+                                product.SellerId = sellerId;
 
                                 product.ClothingPropertiesId = null;
                                 product.ClothingSizes = null;
@@ -318,5 +365,105 @@ namespace WebsiteDatabaseApi
                 }
             }
         }
+
+        public void CheckIfProductsAreInStock()
+        {
+            // if they are at 0 then dont continue idk
+        }
+
+        /// Cart query
+
+        public void AddProductToCart(int productId, int userId, string size)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = "INSERT INTO Cart (UserId, ProductId, ProductSize) VALUES (@UserId, @ProductId, @ProductSize)";
+                cnn.Execute(sql, new { UserId = userId, ProductId = productId, ProductSize = size });
+            }
+        }
+
+        public void RemoveProductFromCart()
+        {
+
+        }
+
+        public List<CartModel> GetCartForUser(int userId)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = "SELECT * FROM Cart WHERE Cart.UserId = @Id";
+                var output = cnn.Query<CartModel>(sql, new { Id = userId }).ToList();
+                return output;
+            }
+        }
+
+        public void UserPaysCart(int userId)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                cnn.Open();
+
+                using (IDbTransaction transcation = cnn.BeginTransaction())
+                {
+                    string _sql = "SELECT * FROM Cart WHERE UserId = @Id";
+                    var cart = cnn.Query<CartModel>(_sql, new { Id = userId });
+                    int[] ProductIds = new int[0];
+
+                    foreach (var products in cart)
+                    {
+                        try
+                        {
+                            string sql1 = "SELECT ProductId FROM Cart WHERE Cart.UserId = @Id";
+                            string sql2 = "SELECT ProductSize FROM Cart WHERE Cart.UserId = @Id";
+                            string sql3 = "DELETE FROM Cart WHERE Cart.UserId = @Id LIMIT 1";
+
+                            // Get relevant id's and remove items from cart.
+                            int ProductId = cnn.QueryFirstOrDefault<int>(sql1, new { Id = userId });
+                            string ProductSize = cnn.QueryFirstOrDefault<string>(sql2, new { Id = userId });
+                            cnn.Execute(sql3, new { Id = userId });
+
+                            // Check category for productId & get SizeId
+                            string sql4 = "SELECT CategoryId FROM Products WHERE Products.Id = @Id";
+                            int CategoryId = cnn.QueryFirstOrDefault<int>(sql4, new { Id = ProductId });
+
+                            // Update the Size in the productId to -1 current.
+                            if (CategoryId == 1)
+                            {
+                                string sql5 = "SELECT ClothingProperties.SizeId FROM Products INNER JOIN ClothingProperties ON ClothingProperties.Id = Products.ClothingPropertiesId WHERE Products.Id = @Id";
+                                int SizeId = cnn.QueryFirstOrDefault<int>(sql5, new { Id = ProductId });
+
+                                string sql6 = $"UPDATE ClothingSizes SET [{ProductSize}] = [{ProductSize}] - 1 WHERE ClothingSizes.Id = @SizeId";
+                                cnn.Execute(sql6, new { SizeId = SizeId });
+
+                                ProductIds = ProductIds.Concat(new[] { ProductId }).ToArray();
+                            }
+                            else if (CategoryId == 2)
+                            {
+                                string sql5 = "SELECT ShoesProperties.SizeId FROM Products INNER JOIN ShoesProperties ON ShoesProperties.Id = Products.ShoesPropertiesId WHERE Products.Id = @Id";
+                                int SizeId = cnn.QueryFirstOrDefault<int>(sql5, new { Id = ProductId });
+
+                                string sql6 = $"UPDATE ShoesSizes SET [{ProductSize}] = [{ProductSize}] - 1 WHERE ShoesSizes.Id = @SizeId";
+                                cnn.Execute(sql6, new { SizeId = SizeId });
+
+                                ProductIds = ProductIds.Concat(new[] { ProductId }).ToArray();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                    }
+
+                    transcation.Commit();
+                    Console.WriteLine(ProductIds);
+                    SellerInformationUpdate(ProductIds);
+                }
+            }
+        }
     }
-}
+
+        /// Wishlist query
+
+
+        /// Seller dashboard query's
+    }
