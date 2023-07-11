@@ -88,7 +88,7 @@ namespace WebsiteDatabaseApi.Controllers
         [HttpPost("CreateListingClothes")]
         public async Task<IActionResult> CreateListingClothes(int SellerId, string Name, double Price, string Color, string Brand, IFormFile picture, [FromForm] int[] sizes)
         {
-            if(_db.CheckIfSellerExist(SellerId) == false)
+            if (_db.CheckIfSellerExist(SellerId) == false)
             {
                 BadRequest("Seller does not exist");
             }
@@ -189,7 +189,7 @@ namespace WebsiteDatabaseApi.Controllers
             }
             else
             {
-                return BadRequest("size array does not contain excatly 4 elements");
+                return BadRequest("size array does not contain excatly 9 elements");
             }
         }
         [HttpPost("CreateReview")]
@@ -197,33 +197,49 @@ namespace WebsiteDatabaseApi.Controllers
         {
             string timestamp = DateTime.UtcNow.ToString();
 
-            if(_db.CheckIfProductExist(productId) != true)
+            if (_db.CheckIfProductExist(productId) != true)
             {
                 BadRequest("ProductId does not exist");
             }
-            if(_db.CheckIfUserExist(userId) != true)
+            if (_db.CheckIfUserExist(userId) != true)
             {
                 BadRequest("UserId does not exist");
             }
-            if(rating > 5 || rating < 0)
+            if (rating > 5 || rating < 0)
             {
                 BadRequest("rating too high or too low");
             }
-            
+
             _db.CreateReview(productId, userId, rating, text, timestamp);
 
             return Ok("Created with timestamp: " + timestamp);
         }
 
-        // Cart
-
-        [HttpPost("UserBuysCart")]
-        public IActionResult UserBuyCart(int userId)
+        [HttpPost("DeleteReview")]
+        public IActionResult DeleteReview(int userId, int reviewId)
         {
             try
             {
-                _db.UserPaysCart(userId);
-                return Ok("User bought his cart");
+                _db.DeleteReview(userId, reviewId);
+                return Ok("Review deleted");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("DeleteProduct")]
+        public IActionResult DeleteProduct(int productId)
+        {
+            try
+            {
+                if(_db.CheckIfProductExist(productId) == false)
+                {
+                    return BadRequest("ProductId does not exist");
+                }
+                _db.DeleteProduct(productId);
+                return Ok();
             }
             catch (Exception ex)
             {

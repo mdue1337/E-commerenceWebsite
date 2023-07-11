@@ -2,13 +2,15 @@ Review querys
 	- create review ^j
 	- get review for product ^j
 		- update average rating for seller ^j
+	- delete review ^j
 
 Product querys
 	- get all products ^j
 		- sort by category or id ^j
 	- create product, clothing and shoes ^j
-	- remove product
-	- size out of stock checker.
+	- remove product ^j
+
+	- ****************size out of stock checker***********************
 
 User querys
 	- create user ^j
@@ -19,12 +21,12 @@ User querys
 	- delete seller user ^j
 
 Wishlist querys
-	- add to wishlist
-	- remove from wishlist
-	- get wishlist
+	- add to wishlist ^j
+	- remove from wishlist ^j
+	- get wishlist ^j
 
 Cart querys
 	- add to cart ^j
 	- remove from cart ^j
 	- go to payment, will delete items in cart and update the stock associated ^j
-		- update sellerinformation table
+		- update sellerinformation table ^j
