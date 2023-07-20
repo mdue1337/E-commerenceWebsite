@@ -35,17 +35,10 @@ namespace WebsiteDatabaseApi.Controllers
         public IActionResult GetAllProductsByCategory(int category)
         {
             List<ProductsModel> products = _db.GetAllProducts();
-            bool foundMatch = false;
 
-            foreach (var product in products)
-            {
-                if (product.CategoryId == category)
-                {
-                    foundMatch = true;
-                }
-            }
+            var product = products.FirstOrDefault(p => p.CategoryId == category);
 
-            if (!foundMatch)
+            if (product == null)
             {
                 return BadRequest("CategoryId not found");
             }
@@ -90,15 +83,15 @@ namespace WebsiteDatabaseApi.Controllers
         {
             if (_db.CheckIfSellerExist(SellerId) == false)
             {
-                BadRequest("Seller does not exist");
+                return BadRequest("Seller does not exist");
             }
 
             if (sizes == null || sizes.Length == 0 || picture == null || picture.Length == 0)
             {
-                BadRequest("Picture or size array is not suffient");
+                return BadRequest("Picture or size array is not suffient");
             }
 
-            if (sizes.Length == 4)
+            if (sizes!.Length == 4)
             {
                 try
                 {
@@ -144,14 +137,14 @@ namespace WebsiteDatabaseApi.Controllers
         {
             if (_db.CheckIfSellerExist(SellerId) == false)
             {
-                BadRequest("Seller does not exist");
+                return BadRequest("Seller does not exist");
             }
 
             if (sizes == null || sizes.Length == 0 || picture == null || picture.Length == 0)
             {
-                BadRequest("Picture or size array is not suffient");
+               return BadRequest("Picture or size array is not suffient");
             }
-
+            
             if (sizes.Length == 9)
             {
                 try
@@ -199,15 +192,15 @@ namespace WebsiteDatabaseApi.Controllers
 
             if (_db.CheckIfProductExist(productId) != true)
             {
-                BadRequest("ProductId does not exist");
+                return BadRequest("ProductId does not exist");
             }
             if (_db.CheckIfUserExist(userId) != true)
             {
-                BadRequest("UserId does not exist");
+                return BadRequest("UserId does not exist");
             }
             if (rating > 5 || rating < 0)
             {
-                BadRequest("rating too high or too low");
+                return BadRequest("rating too high or too low");
             }
 
             _db.CreateReview(productId, userId, rating, text, timestamp);

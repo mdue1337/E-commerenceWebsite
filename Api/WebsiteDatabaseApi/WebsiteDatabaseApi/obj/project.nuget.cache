@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "6jH5p6H1LrIy6rF7IiaF2El2zH//dpPTnMFrpAOnpBWg+GnwHBQydjLFYkWiwWn1NHu/7RFVjlMHo1ZD1PfmUw==",
+  "dgSpecHash": "GNvZMa+qNsWKLYRRDCEwsJ0msKpWpb/Z3TGG6PvcIQxBQ298KVDDsIEo4L+eOpTluMx9+Y00cdM/CCQjT8yt8A==",
   "success": true,
-  "projectFilePath": "C:\\Users\\marti\\OneDrive - TEC\\Documents\\Martins Coding Projects\\E-commerenceWebsite\\Api\\WebsiteDatabaseApi\\WebsiteDatabaseApi\\WebsiteDatabaseApi.csproj",
+  "projectFilePath": "C:\\Users\\marti\\Documents\\Code Projects\\website\\E-commerenceWebsite\\Api\\WebsiteDatabaseApi\\WebsiteDatabaseApi\\WebsiteDatabaseApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\marti\\.nuget\\packages\\dapper\\2.0.143\\dapper.2.0.143.nupkg.sha512",
     "C:\\Users\\marti\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",

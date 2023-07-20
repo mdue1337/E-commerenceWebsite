@@ -209,8 +209,17 @@ namespace WebsiteDatabaseApi.Controllers
 
                 if (isSizeAllowed == true)
                 {
-                    _db.AddProductToCart(productId, userId, Size);
-                    return Ok("Item added to cart");
+                    bool isInStock = _db.CheckIfProductAreInStock(productId, Size);
+
+                    if(isInStock == true) 
+                    {
+                        _db.AddProductToCart(productId, userId, Size);
+                        return Ok("Item added to cart");
+                    }
+                    else
+                    {
+                        return BadRequest("Product not in stock and therefore not added to cart");
+                    }
                 }
                 else
                 {

@@ -153,7 +153,7 @@ namespace WebsiteDatabaseApi
 
         public List<SellerModel> GetSellers()
         {
-            using(IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
                 string sql = "SELECT * FROM Sellers";
                 var query = cnn.Query<SellerModel>(sql);
@@ -432,6 +432,8 @@ namespace WebsiteDatabaseApi
                     throw new Exception("CategoryId does not exist");
                 }
 
+                // Cascade delete til næste gang! https://www.geeksforgeeks.org/mysql-on-delete-cascade-constraint/
+
                 // Delete all reviews for product & update reviewcalc....
                 string sqlSeller = "SELECT * FROM Sellers";
                 var sellers = cnn.Query<SellerModel>(sqlSeller);
@@ -452,7 +454,7 @@ namespace WebsiteDatabaseApi
                     string sql3 = $"SELECT LastProductSoldProductId FROM SellerInformation WHERE SellerId = {seller.Id}";
                     int? lastSoldProductId = cnn.QueryFirstOrDefault<int?>(sql3);
 
-                    if(lastSoldProductId == null)
+                    if (lastSoldProductId == null)
                     {
                         continue;
                     }
@@ -566,9 +568,81 @@ namespace WebsiteDatabaseApi
             }
         }
 
-        public void CheckIfProductsAreInStock()
+        public bool CheckIfProductAreInStock(int productId, string size)
         {
-            // if they are at 0 then dont continue idk
+            bool isInStock;
+
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = $"SELECT * FROM Products WHERE Id = {productId}";
+
+                var productSizeId = cnn.Query<ProductsModel>(sql).ToList();
+
+                string MainTable = "";
+                string SecondTable = "";
+                int? id = 0;
+
+                for (int i = 0; i < productSizeId.Count; i++)
+                {
+                    if (productSizeId[i].ClothingPropertiesId is not null)
+                    {
+                        id = productSizeId[i].ClothingPropertiesId;
+                        MainTable = "ClothingProperties";
+                        SecondTable = "ClothingSizes";
+                    }
+                    else if (productSizeId[i].ShoesPropertiesId is not null)
+                    {
+                        id = productSizeId[i].ShoesPropertiesId;
+                        MainTable = "ShoesProperties";
+                        SecondTable = "ShoeSizes";
+                    }
+                }
+
+                string sizequery = $"SELECT * FROM {MainTable} INNER JOIN {SecondTable} WHERE {MainTable}.Id = {id}";
+
+                if (MainTable == "ClothingProperties")
+                {
+                    var sizes = cnn.Query<ClothingSizes>(sizequery).ToList();
+
+                    var sizeProperty = typeof(ClothingSizes).GetProperty(size);
+
+                    int sizeValue = (int)sizeProperty.GetValue(sizes[0]);
+
+                    if (sizeValue == 0)
+                    {
+                        isInStock = false;
+                    }
+                    else
+                    {
+                        isInStock = true;
+                    }
+
+                    return isInStock;
+                }
+                else if (MainTable == "ShoesProperties")
+                {
+                    var sizes = cnn.Query<ShoesSizes>(sizequery).ToList();
+
+                    var sizeProperty = typeof(ShoesSizes).GetProperty(size);
+
+                    int sizeValue = (int)sizeProperty.GetValue(sizes[0]);
+
+                    if (sizeValue == 0)
+                    {
+                        isInStock = false;
+                    }
+                    else
+                    {
+                        isInStock = true;
+                    }
+
+                    return isInStock;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
         /// Cart query
@@ -622,6 +696,16 @@ namespace WebsiteDatabaseApi
                     string _sql = "SELECT * FROM Cart WHERE UserId = @Id";
                     var cart = cnn.Query<CartModel>(_sql, new { Id = userId });
                     int[] ProductIds = new int[0];
+
+                    foreach (var size in cart)
+                    {
+                        bool IsInStock = CheckIfProductAreInStock(size.ProductId, size.ProductSize);
+
+                        if(IsInStock is not true)
+                        {
+                            throw new Exception(size.ProductSize + " was not in stock");
+                        }
+                    }
 
                     foreach (var products in cart)
                     {
