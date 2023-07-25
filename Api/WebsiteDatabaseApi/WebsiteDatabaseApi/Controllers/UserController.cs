@@ -22,7 +22,15 @@ namespace WebsiteDatabaseApi.Controllers
         {
             try
             {
-                return Ok(_db.LoadUsers());
+                var users = _db.LoadUsers();
+                if(users == null)
+                {
+                    return Ok("No users registered");
+                }
+                else
+                {
+                    return Ok(users);
+                }
             }
             catch (Exception ex)
             {
@@ -57,12 +65,19 @@ namespace WebsiteDatabaseApi.Controllers
         {
             try
             {
-                return Ok(_db.GetSellers());
+                var sellers = _db.GetSellers();
+                if (sellers == null)
+                {
+                    return Ok("No sellers registered");
+                }
+                else
+                {
+                    return Ok(sellers);
+                }
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
-
             }
         }
 
@@ -73,7 +88,7 @@ namespace WebsiteDatabaseApi.Controllers
             {
                 if (_db.CheckIfSellerExist(sellerId) == false)
                 {
-                    return BadRequest("User does not exist");
+                    return BadRequest("Seller does not exist");
                 }
                 else
                 {
@@ -99,7 +114,15 @@ namespace WebsiteDatabaseApi.Controllers
                 }
                 else
                 {
-                    return Ok(_db.GetWishlistForUser(userId));
+                    var wishlist = _db.GetWishlistForUser(userId);
+                    if (wishlist == null)
+                    {
+                        return Ok("User has no wishlist");
+                    }
+                    else
+                    {
+                        return Ok(wishlist);
+                    }
                 }
             }
             catch (Exception ex)
@@ -117,7 +140,18 @@ namespace WebsiteDatabaseApi.Controllers
                 {
                     return BadRequest("User does not exist");
                 }
-                return Ok(_db.GetCartForUser(userId));
+                else
+                {
+                    var cart = _db.GetCartForUser(userId);
+                    if (cart == null)
+                    {
+                        return Ok("User has no cart currently");
+                    }
+                    else
+                    {
+                        return Ok(cart);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -238,8 +272,15 @@ namespace WebsiteDatabaseApi.Controllers
         {
             try
             {
-                _db.UserPaysCart(userId);
-                return Ok("User bought his cart");
+                if(_db.GetCartForUser(userId) == null)
+                {
+                    return BadRequest("User has no cart");
+                }
+                else
+                {
+                    _db.UserPaysCart(userId);
+                    return Ok("User bought his cart");
+                }
             }
             catch (Exception ex)
             {

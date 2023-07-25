@@ -263,6 +263,24 @@ namespace WebsiteDatabaseApi
             }
         }
 
+        public bool CheckIfReviewExist(int reviewId)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = "SELECT COUNT(*) FROM Review WHERE Id = @Id";
+                var num = cnn.QueryFirstOrDefault<int>(sql, new { Id = reviewId });
+
+                if (num == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
         // Product querys.
 
         public string CreateListingClothes(int[] sizes, string color, string brand, string name, double price, byte[] picture, int sellerId)

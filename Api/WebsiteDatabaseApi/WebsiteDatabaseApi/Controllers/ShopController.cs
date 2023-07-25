@@ -23,7 +23,16 @@ namespace WebsiteDatabaseApi.Controllers
         {
             try
             {
-                return Ok(_db.GetAllProducts());
+                var products = _db.GetAllProducts();
+
+                if (products == null)
+                {
+                    return BadRequest("No products found");
+                }
+                else
+                {
+                    return Ok(products);
+                }
             }
             catch (Exception)
             {
@@ -52,7 +61,6 @@ namespace WebsiteDatabaseApi.Controllers
         [HttpGet("GetProductById")]
         public IActionResult GetProductById(int productId)
         {
-            // Does product exist?
             if (_db.CheckIfProductExist(productId) == true)
             {
                 var products = _db.GetAllProducts();
@@ -70,7 +78,22 @@ namespace WebsiteDatabaseApi.Controllers
         {
             try
             {
-                return Ok(_db.ReviewsForProduct(productId));
+                if(_db.CheckIfProductExist(productId) == true)
+                {
+                    var products = _db.GetAllProducts();
+                    if(products == null)
+                    {
+                        return Ok("No reviews found for product");
+                    }
+                    else
+                    {
+                        return Ok(products);
+                    }
+                }
+                else
+                {
+                    return BadRequest("ProductId does not exist");
+                }
             }
             catch (Exception ex)
             {
@@ -145,7 +168,7 @@ namespace WebsiteDatabaseApi.Controllers
                return BadRequest("Picture or size array is not suffient");
             }
             
-            if (sizes.Length == 9)
+            if (sizes!.Length == 9)
             {
                 try
                 {
@@ -200,7 +223,7 @@ namespace WebsiteDatabaseApi.Controllers
             }
             if (rating > 5 || rating < 0)
             {
-                return BadRequest("rating too high or too low");
+                return BadRequest("Rating too high or too low");
             }
 
             _db.CreateReview(productId, userId, rating, text, timestamp);
@@ -213,8 +236,15 @@ namespace WebsiteDatabaseApi.Controllers
         {
             try
             {
-                _db.DeleteReview(userId, reviewId);
-                return Ok("Review deleted");
+                if(_db.CheckIfReviewExist(reviewId) == true && _db.CheckIfUserExist(userId))
+                {
+                    _db.DeleteReview(userId, reviewId);
+                    return Ok("Review deleted");
+                }
+                else
+                {
+                    return BadRequest("ReviewId does not exist or UserId does not exist");
+                }
             }
             catch (Exception ex)
             {
@@ -231,8 +261,11 @@ namespace WebsiteDatabaseApi.Controllers
                 {
                     return BadRequest("ProductId does not exist");
                 }
-                _db.DeleteProduct(productId);
-                return Ok();
+                else
+                {
+                    _db.DeleteProduct(productId);
+                    return Ok();
+                }
             }
             catch (Exception ex)
             {
