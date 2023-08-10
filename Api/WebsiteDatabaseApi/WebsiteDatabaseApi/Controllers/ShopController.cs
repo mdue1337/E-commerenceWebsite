@@ -231,7 +231,7 @@ namespace WebsiteDatabaseApi.Controllers
             return Ok("Created with timestamp: " + timestamp);
         }
 
-        [HttpPost("DeleteReview")]
+        [HttpDelete("DeleteReview")]
         public IActionResult DeleteReview(int userId, int reviewId)
         {
             try

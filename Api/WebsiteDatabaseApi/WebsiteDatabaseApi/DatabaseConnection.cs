@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -29,19 +30,7 @@ namespace WebsiteDatabaseApi
 
         public void CreateUser(string firstName, string lastName, string street, int streetNum, string city, int postNum, string email, string password)
         {
-            using (SHA256 sha256Hash = SHA256.Create())
-            {
-                // Convert the hash to bytes
-                byte[] bytes = Encoding.UTF8.GetBytes(password);
-
-                // Compute the hash
-                byte[] hashedBytes = sha256Hash.ComputeHash(bytes);
-
-                // Convert the hashed bytes to a string
-                string finalHash = BitConverter.ToString(hashedBytes).Replace("-", string.Empty).ToLower();
-
-                password = finalHash;
-            }
+            password = GenerateHashPW(password);
 
             UserModel user = new UserModel()
             {
@@ -66,6 +55,122 @@ namespace WebsiteDatabaseApi
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+            }
+        }
+
+        private static string GenerateHashPW(string password)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                // Convert the hash to bytes
+                byte[] bytes = Encoding.UTF8.GetBytes(password);
+
+                // Compute the hash
+                byte[] hashedBytes = sha256Hash.ComputeHash(bytes);
+
+                // Convert the hashed bytes to a string
+                string finalHash = BitConverter.ToString(hashedBytes).Replace("-", string.Empty).ToLower();
+
+                password = finalHash;
+            }
+
+            return password;
+        }
+
+        public string UpdateUserInfo(int userId, string? FirstName, string? LastName, string? street, int? streetNum, int? postNum, string? email, string? password)
+        { 
+            using(IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                List<string> list = new();
+
+                if(FirstName is not null)
+                {
+                    list.Add("FirstName = @FirstName");
+                }
+                if(LastName is not null)
+                {
+                    list.Add("LastName = @LastName");
+                }
+                if(street is not null)
+                {
+                    list.Add("Street = @street");
+                }
+                if(streetNum is not null)
+                {
+                    list.Add("streetNum = @streetNum");
+                }
+                if(postNum is not null)
+                {
+                    list.Add("PostNum = @postNum");
+                }
+                if(email is not null)
+                {
+                    list.Add("Email = @email");
+                }
+                if(password is not null)
+                {
+                    list.Add("Password = @password");
+                }
+
+                if (list.Count > 0)
+                {
+                    string updatedFields = string.Join(", ", list);
+
+                    string sql = $"UPDATE Users SET {updatedFields} WHERE Id = @Id";
+                    
+                    using(IDbCommand cmd = cnn.CreateCommand())
+                    {
+                        cnn.Open();
+                        cmd.CommandText = sql;
+                        cmd.Parameters.Add(new SQLiteParameter("@Id", userId));
+
+                        if (FirstName is not null)
+                        {
+                            cmd.Parameters.Add(new SQLiteParameter("@FirstName", FirstName));
+                        }
+                        if (LastName is not null)
+                        {
+                            cmd.Parameters.Add(new SQLiteParameter("@LastName", LastName));
+                        }
+                        if (street is not null)
+                        {
+                            cmd.Parameters.Add(new SQLiteParameter("@street", street));
+                        }
+                        if (streetNum is not null)
+                        {
+                            cmd.Parameters.Add(new SQLiteParameter("@streetNum", streetNum));
+                        }
+                        if (postNum is not null)
+                        {
+                            cmd.Parameters.Add(new SQLiteParameter("@postNum", postNum));
+                        }
+                        if (email is not null)
+                        {
+                            cmd.Parameters.Add(new SQLiteParameter("@email", email));
+                        }
+                        if (password is not null)
+                        {
+                            password = GenerateHashPW(password);
+                            cmd.Parameters.Add(new SQLiteParameter("@password", password));
+                        }
+                        
+                        cmd.ExecuteNonQuery();
+                        cnn.Close();
+                    }
+
+                    List<string> updatedValues = new();
+
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        updatedValues.Add(list[i].Split(' ')[0]);
+                    }
+
+                    return $"Updated: {string.Join(", ", updatedValues)}";
+                }
+                else
+                {
+                    return "No fields updated";
+                }
             }
         }
 
@@ -139,6 +244,79 @@ namespace WebsiteDatabaseApi
 
                 string sql2 = "INSERT INTO SellerInformation (SellerId, Earnings, ProductsSold) VALUES (@Id, 0, 0)";
                 cnn.Execute(sql2, new { Id = sellerId });
+            }
+        }
+
+        public string UpdateSellerInfo(int sellerId, string? FullName, string? Email, string? Phone, string? Password)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                List<string> list = new();
+
+                if (FullName is not null)
+                {
+                    list.Add("FullName = @FullName");
+                }
+                if (Email is not null)
+                {
+                    list.Add("Email = @Email");
+                }
+                if (Phone is not null)
+                {
+                    list.Add("Phone = @Phone");
+                }
+                if (Password is not null)
+                {
+                    list.Add("Password = @Password");
+                }
+
+                if (list.Count > 0)
+                {
+                    string updatedFields = string.Join(", ", list);
+
+                    string sql = $"UPDATE Sellers SET {updatedFields} WHERE Id = @Id";
+
+                    using (IDbCommand cmd = cnn.CreateCommand())
+                    {
+                        cnn.Open();
+                        cmd.CommandText = sql;
+                        cmd.Parameters.Add(new SQLiteParameter("@Id", sellerId));
+
+                        if (FullName is not null)
+                        {
+                            cmd.Parameters.Add(new SQLiteParameter("@FullName", FullName));
+                        }
+                        if (Email is not null)
+                        {
+                            cmd.Parameters.Add(new SQLiteParameter("@Email", Email));
+                        }
+                        if (Phone is not null)
+                        {
+                            cmd.Parameters.Add(new SQLiteParameter("@Phone", Phone));
+                        }
+                        if (Password is not null)
+                        {
+                            Password = GenerateHashPW(Password);
+                            cmd.Parameters.Add(new SQLiteParameter("@Password", Password));
+                        }
+
+                        cmd.ExecuteNonQuery();
+                        cnn.Close();
+                    }
+
+                    List<string> updatedValues = new();
+
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        updatedValues.Add(list[i].Split(' ')[0]);
+                    }
+
+                    return $"Updated: {string.Join(", ", updatedValues)}";
+                }
+                else
+                {
+                    return "No fields updated";
+                }
             }
         }
 

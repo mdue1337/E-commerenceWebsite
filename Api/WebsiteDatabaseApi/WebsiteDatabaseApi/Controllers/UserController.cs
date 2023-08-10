@@ -187,28 +187,6 @@ namespace WebsiteDatabaseApi.Controllers
             }
         }
 
-        [HttpPost("CalcSellerReviewRating")]
-        public IActionResult CalcRatingReview(int sellerId)
-        {
-            try
-            {
-                if(_db.CheckIfSellerExist(sellerId) == false)
-                {
-                    return BadRequest("SellerId does not exist");
-                }
-                double rating = _db.CalcReviewAverageRatingForSeller(sellerId);
-                if(rating == -1)
-                {
-                    return BadRequest("Calc failed or there was no reviews");
-                }
-                return Ok("Rating for seller is: " + rating);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
         [HttpPost("AddProductToWishlist")]
         public IActionResult AddProductToWishlist(int userId, int productId)
         {
@@ -281,6 +259,76 @@ namespace WebsiteDatabaseApi.Controllers
                     _db.UserPaysCart(userId);
                     return Ok("User bought his cart");
                 }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("UpdateUserInformation")]
+        public IActionResult UpdateInfoUser(int userId, string? FirstName, string? LastName, string? street, int? streetNum, int? postNum, string? email, string? password)
+        {
+            try
+            {
+                if(_db.CheckIfUserExist(userId) == false)
+                {
+                    return BadRequest("UserId does not exist");
+                }
+                string response = _db.UpdateUserInfo(userId, FirstName, LastName, street, streetNum, postNum, email, password);
+
+                if(response == "No fields updated")
+                {
+                    return BadRequest("No fields updated. Could be because of a lack of information");
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("UpdateSellerInformation")]
+        public IActionResult UpdateInfoSeller(int sellerId, string? FullName, string? Email, string? Phone, string? Password)
+        {
+            try
+            {
+                if(_db.CheckIfSellerExist(sellerId) == false)
+                {
+                    return BadRequest("SellerId does not exist");
+                }
+                string response = _db.UpdateSellerInfo(sellerId, FullName, Email, Phone, Password);
+
+                if(response == "No fields updated")
+                {
+                    return BadRequest("No fields updated. Could be because of a lack of information");
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("CalcSellerReviewRating")]
+        public IActionResult CalcRatingReview(int sellerId)
+        {
+            try
+            {
+                if (_db.CheckIfSellerExist(sellerId) == false)
+                {
+                    return BadRequest("SellerId does not exist");
+                }
+                double rating = _db.CalcReviewAverageRatingForSeller(sellerId);
+                if (rating == -1)
+                {
+                    return BadRequest("Calc failed or there was no reviews");
+                }
+                return Ok("Rating for seller is: " + rating);
             }
             catch (Exception ex)
             {
