@@ -231,6 +231,56 @@ namespace WebsiteDatabaseApi.Controllers
             return Ok("Created with timestamp: " + timestamp);
         }
 
+        [HttpPut("UpdateClothingStock")]
+        public IActionResult UpdateClothingStock(int productId, [FromForm] int?[] clothingsizes)
+        {
+            int categoryId = 1;
+            if (_db.CheckIfProductCategory(categoryId, productId) == false && _db.CheckIfProductExist(productId) == false)
+            {
+                return BadRequest("Product not found");
+            }
+
+            if (clothingsizes.Length != 4)
+            {
+                return BadRequest("Please send 4 elements in the size int array");
+            }
+
+            _db.UpdateClothingStock(productId, clothingsizes);
+
+            return Ok("Stock updated");
+        }
+
+        [HttpPut("UpdateShoesStock")]
+        public IActionResult UpdateShoesStock(int productId, [FromForm] int?[] Shoesizes)
+        {
+            int categoryId = 2;
+            if (_db.CheckIfProductCategory(categoryId, productId) == false && _db.CheckIfProductExist(productId) == false)
+            {
+                return BadRequest("Product not found");
+            }
+
+            if(Shoesizes.Length != 9)
+            {
+                return BadRequest("Please send 9 elements in the size int array");
+            }
+
+            // _db.UpdateShoesStock(); // skal laves følg samme struktur som ClothingStock
+
+            return Ok();
+        }
+
+        [HttpPut("UpdateProductPrice")] // test om virker
+        public IActionResult UpdatePrice(int productId, int price)
+        {
+            if(_db.CheckIfProductExist(productId) == false)
+            {
+                return BadRequest("ProductId does not exist");
+            }
+            _db.UpdateProductPrize(productId, price);
+
+            return Ok("Price updated");
+        }
+
         [HttpDelete("DeleteReview")]
         public IActionResult DeleteReview(int userId, int reviewId)
         {

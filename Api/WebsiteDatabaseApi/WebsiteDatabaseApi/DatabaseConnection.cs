@@ -764,6 +764,24 @@ namespace WebsiteDatabaseApi
             }
         }
 
+        public bool CheckIfProductCategory(int productId, int categoryId)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = "SELECT COUNT(*) FROM Products WHERE CategoryId = @CategoryId AND Id = @Id";
+                var num = cnn.QueryFirstOrDefault<int>(sql, new { CategoryId = categoryId, Id = productId });
+
+                if (num == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
         public bool CheckIfProductAreInStock(int productId, string size)
         {
             bool isInStock;
@@ -838,6 +856,84 @@ namespace WebsiteDatabaseApi
                 {
                     return false;
                 }
+            }
+        }
+
+        public void UpdateClothingStock(int productId, int?[] sizes)
+        {
+            using(IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                List<string> sqlextra = new();
+
+                for (int i = 0; i < sizes.Length; i++)
+                {
+                    if (sizes[i] is not null)
+                    {
+                        if(i == 0)
+                        {
+                            sqlextra.Add("Small = @Small");
+                        }
+                        if(i == 1)
+                        {
+                            sqlextra.Add("Medium = @Medium");
+                        }
+                        if(i == 2)
+                        {
+                            sqlextra.Add("Large = @Large");
+                        }
+                        if(i == 3)
+                        {
+                            sqlextra.Add("XL = @XL");
+                        }
+                    }
+                }
+
+                string updatedFields = string.Join(", ", sqlextra);
+
+                string sql = $"UPDATE ClothingSizes SET {updatedFields} WHERE Id = @Id";
+
+                using(IDbCommand cmd = cnn.CreateCommand())
+                {
+                    cnn.Open();
+                    cmd.CommandText = sql;
+                    cmd.Parameters.Add(new SQLiteParameter("@Id", productId));
+                    
+                    if (sizes[0] is not null)
+                    {
+                        cmd.Parameters.Add(new SQLiteParameter("@Small", sizes[0]));
+                    }
+                    if (sizes[1] is not null)
+                    {
+                        cmd.Parameters.Add(new SQLiteParameter("@Medium", sizes[1]));
+                    }
+                    if (sizes[2] is not null)
+                    {
+                        cmd.Parameters.Add(new SQLiteParameter("@Large", sizes[2]));
+                    }
+                    if (sizes[3] is not null)
+                    {
+                        cmd.Parameters.Add(new SQLiteParameter("@XL", sizes[3]));
+                    }
+                    cmd.ExecuteNonQuery();
+                    cnn.Close();
+                }
+            }
+        }
+
+        public void UpdateShoesStock(int productId, int?[] sizes)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+
+            }
+        }
+
+        public void UpdateProductPrize(int productId, int price)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
+            {
+                string sql = "UPDATE Products SET Price = @Price WHERE Id = @Id";
+                cnn.Execute(sql, new {Id = productId, Price = price});
             }
         }
 
