@@ -326,7 +326,7 @@ namespace WebsiteDatabaseApi.Controllers
                 double rating = _db.CalcReviewAverageRatingForSeller(sellerId);
                 if (rating == -1)
                 {
-                    return BadRequest("Calc failed or there was no reviews");
+                    return BadRequest("Calc failed or there was no reviews.");
                 }
                 return Ok("Rating for seller is: " + rating);
             }

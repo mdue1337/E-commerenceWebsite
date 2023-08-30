@@ -125,7 +125,6 @@ namespace WebsiteDatabaseApi.Controllers
 
                         using (var image = Image.Load(memoryStream))
                         {
-                            // image.Mutate(x => x.Resize(500, 500));
                             byte[] imageBytes;
                             using (var outputStream = new MemoryStream())
                             {
@@ -264,13 +263,13 @@ namespace WebsiteDatabaseApi.Controllers
                 return BadRequest("Please send 9 elements in the size int array");
             }
 
-            // _db.UpdateShoesStock(); // skal laves følg samme struktur som ClothingStock
+            _db.UpdateShoesStock(productId, Shoesizes);
 
-            return Ok();
+            return Ok("Stock updated");
         }
 
-        [HttpPut("UpdateProductPrice")] // test om virker
-        public IActionResult UpdatePrice(int productId, int price)
+        [HttpPut("UpdateProductPrice")]
+        public IActionResult UpdatePrice(int productId, double price)
         {
             if(_db.CheckIfProductExist(productId) == false)
             {

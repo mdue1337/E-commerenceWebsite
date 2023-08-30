@@ -392,20 +392,37 @@ namespace WebsiteDatabaseApi
 
         public void CreateReview(int productId, int userId, int rating, string text, string timestamp)
         {
+            int? sellerId = null;
+
             using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
                 string sql = "INSERT INTO Review (ProductId, UserId, Rating, Text, Timestamp) VALUES (@ProductId, @UserId, @Rating, @Text, @Timestamp)";
                 cnn.Execute(sql, new { ProductId = productId, UserId = userId, Rating = rating, Text = text, Timestamp = timestamp });
+
+                string getSeller = "SELECT SellerId FROM Products WHERE Products.Id = @Id";
+                sellerId = cnn.QueryFirstOrDefault<int>(getSeller, new { Id = productId });
             }
+
+            CalcReviewAverageRatingForSeller((int)sellerId);
         }
 
         public void DeleteReview(int userId, int reviewId)
         {
+            int? sellerId = null;
+
             using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
                 string sql = "DELETE FROM Review WHERE Review.Id = @ReviewId AND Review.UserId = @Id";
                 cnn.Execute(sql, new { Id = userId, ReviewId = reviewId });
+
+                string getProductId = "SELECT Review.ProductId FROM Review WHERE Review.Id = @ReviewId AND Review.UserId = @Id";
+                int productId = cnn.QueryFirstOrDefault<int>(getProductId, new { Id = userId, ReviewId = reviewId });
+
+                string getSeller = "SELECT SellerId FROM Products WHERE Products.Id = @Id";
+                sellerId = cnn.QueryFirstOrDefault<int>(getSeller, new { Id = productId });
             }
+
+            CalcReviewAverageRatingForSeller((int)sellerId);
         }
 
         public List<ReviewModel> ReviewsForProduct(int productId)
@@ -429,6 +446,8 @@ namespace WebsiteDatabaseApi
 
                 if (ratings.Count == 0)
                 {
+                    string nullValue = "UPDATE SellerInformation SET SellerAverageReviewRating = NULL WHERE SellerId = " + sellerId;
+                    cnn.Execute(nullValue);
                     return -1;
                 }
 
@@ -864,27 +883,13 @@ namespace WebsiteDatabaseApi
             using(IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
                 List<string> sqlextra = new();
+                string[] sizeNames = ["Small", "Medium", "Large", "XL"];
 
                 for (int i = 0; i < sizes.Length; i++)
                 {
                     if (sizes[i] is not null)
                     {
-                        if(i == 0)
-                        {
-                            sqlextra.Add("Small = @Small");
-                        }
-                        if(i == 1)
-                        {
-                            sqlextra.Add("Medium = @Medium");
-                        }
-                        if(i == 2)
-                        {
-                            sqlextra.Add("Large = @Large");
-                        }
-                        if(i == 3)
-                        {
-                            sqlextra.Add("XL = @XL");
-                        }
+                        sqlextra.Add($"{sizeNames[i]} = @{sizeNames[i]}");
                     }
                 }
 
@@ -897,23 +902,15 @@ namespace WebsiteDatabaseApi
                     cnn.Open();
                     cmd.CommandText = sql;
                     cmd.Parameters.Add(new SQLiteParameter("@Id", productId));
-                    
-                    if (sizes[0] is not null)
+
+                    for (int i = 0; i < sizes.Length; i++)
                     {
-                        cmd.Parameters.Add(new SQLiteParameter("@Small", sizes[0]));
+                        if (sizes[i] is not null)
+                        {
+                            cmd.Parameters.Add(new SQLiteParameter($"@{sizeNames[i]}", sizes[i]));
+                        }
                     }
-                    if (sizes[1] is not null)
-                    {
-                        cmd.Parameters.Add(new SQLiteParameter("@Medium", sizes[1]));
-                    }
-                    if (sizes[2] is not null)
-                    {
-                        cmd.Parameters.Add(new SQLiteParameter("@Large", sizes[2]));
-                    }
-                    if (sizes[3] is not null)
-                    {
-                        cmd.Parameters.Add(new SQLiteParameter("@XL", sizes[3]));
-                    }
+                   
                     cmd.ExecuteNonQuery();
                     cnn.Close();
                 }
@@ -924,11 +921,42 @@ namespace WebsiteDatabaseApi
         {
             using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
+                List<string> sqlextra = new();
+                string[] sizeNames = ["Size38", "Size39", "Size40", "Size41", "Size42", "Size43", "Size44", "Size45", "Size46"];
 
+                for (int i = 0; i < sizes.Length; i++)
+                {
+                    if (sizes[i] is not null)
+                    {
+                        sqlextra.Add($"{sizeNames[i]} = @{sizeNames[i]}");
+                    }
+                }
+
+                string updatedFields = string.Join(", ", sqlextra);
+
+                string sql = $"UPDATE ClothingSizes SET {updatedFields} WHERE Id = @Id";
+
+                using (IDbCommand cmd = cnn.CreateCommand())
+                {
+                    cnn.Open();
+                    cmd.CommandText = sql;
+                    cmd.Parameters.Add(new SQLiteParameter("@Id", productId));
+
+                    for (int i = 0; i < sizes.Length; i++)
+                    {
+                        if (sizes[i] is not null)
+                        {
+                            cmd.Parameters.Add(new SQLiteParameter($"@{sizeNames[i]}", sizes[i]));
+                        }
+                    }
+
+                    cmd.ExecuteNonQuery();
+                    cnn.Close();
+                }
             }
         }
 
-        public void UpdateProductPrize(int productId, int price)
+        public void UpdateProductPrize(int productId, double price)
         {
             using (IDbConnection cnn = new SQLiteConnection(ConnectionString))
             {
